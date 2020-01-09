@@ -3,7 +3,7 @@ authors = ["Michael Beaumont <mjboamail@gmail.com>"]
 edition = "2018"
 readme = "README.md"
 name = "dht-sensor"
-version = "0.1.0"
+version = "0.2.0"
 
 [dependencies]
 embedded-hal = "0.2.3"
