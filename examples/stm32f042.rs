@@ -7,7 +7,7 @@ use cortex_m_semihosting::hprintln;
 use panic_halt as _;
 use stm32f0xx_hal as hal;
 
-use dht_sensor::{read11, Reading};
+use dht_sensor::*;
 
 #[entry]
 fn main() -> ! {
@@ -15,18 +15,21 @@ fn main() -> ! {
     let cp = stm32::CorePeripherals::take().unwrap();
     let mut rcc = p.RCC.configure().sysclk(8.mhz()).freeze(&mut p.FLASH);
     let mut delay = delay::Delay::new(cp.SYST, &rcc);
+    let gpio::gpioa::Parts { pa1, .. } = p.GPIOA.split(&mut rcc);
 
     hprintln!("Waiting on the sensor...").unwrap();
     delay.delay_ms(1000_u16);
-    let gpio::gpioa::Parts { pa1, .. } = p.GPIOA.split(&mut rcc);
+
     let mut pa1 = cortex_m::interrupt::free(|cs| pa1.into_open_drain_output(cs));
+
     match read11(&mut delay, &mut pa1) {
-        Ok(Reading {
+        Ok(Dht11Reading {
             temperature,
-            humidity,
-        }) => hprintln!("{}°, {}% RH", temperature, humidity).unwrap(),
+            relative_humidity,
+        }) => hprintln!("{}°, {}% RH", temperature, relative_humidity).unwrap(),
         Err(e) => hprintln!("Error {:?}", e).unwrap(),
     }
     hprintln!("Looping forever now, thanks!").unwrap();
+
     loop {}
 }
