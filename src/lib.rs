@@ -61,14 +61,19 @@ where
     while pin.is_high()? {}
     let humidity = read_byte(delay, pin)?;
     let _ = read_byte(delay, pin)?;
-    let temperature = read_byte(delay, pin)?;
+    let temp_signed = read_byte(delay, pin)?;
+    let temperature = {
+        let temp_sign = if temp_signed & 0x80 != 0 { -1 } else { 1 };
+        let temp_magnitude = temp_signed & 0x7F;
+        temp_sign * temp_magnitude as i8
+    };
     let _ = read_byte(delay, pin)?;
     let checksum = read_byte(delay, pin)?;
     if humidity + temperature != checksum {
         Err(DhtError::ChecksumMismatch)
     } else {
         Ok(Reading {
-            temperature: temperature as i8,
+            temperature,
             humidity,
         })
     }
