@@ -1,9 +1,14 @@
 [package]
-authors = ["Michael Beaumont <mjboamail@gmail.com>"]
-edition = "2018"
-readme = "README.md"
 name = "dht-sensor"
 version = "0.2.0"
+description = "Driver for the DHT11/DHT22 sensor based on embedded-hal"
+authors = ["Michael Beaumont <mjboamail@gmail.com>"]
+keywords = ["embedded", "sensor", "humidity", "temperature", "embedded-hal-driver", "dht11", "dht22"]
+edition = "2018"
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/michaelbeaumont/dht-sensor"
+homepage = "https://github.com/michaelbeaumont/dht-sensor"
 
 [dependencies]
 embedded-hal = "0.2.3"
