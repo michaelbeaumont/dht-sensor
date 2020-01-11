@@ -15,6 +15,7 @@ fn convert_signed(signed: u8) -> (bool, u8) {
 pub mod dht11 {
     use super::*;
 
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     pub struct Reading {
         pub temperature: i8,
         pub relative_humidity: u8,
@@ -23,7 +24,6 @@ pub mod dht11 {
     pub fn read<P, E, D>(delay: &mut D, pin: &mut P) -> Result<Reading, read::DhtError<E>>
     where
         P: InputPin<Error = E> + OutputPin<Error = E>,
-        E: core::fmt::Debug,
         D: DelayMs<u8> + DelayUs<u8>,
     {
         let [rh, _, temp_signed, _] = read::read_raw(delay, pin)?;
@@ -42,6 +42,7 @@ pub mod dht11 {
 pub mod dht22 {
     use super::*;
 
+    #[derive(Clone, Copy, Debug, PartialEq)]
     pub struct Reading {
         pub temperature: f32,
         pub relative_humidity: f32,
@@ -50,7 +51,6 @@ pub mod dht22 {
     pub fn read<P, E, D>(delay: &mut D, pin: &mut P) -> Result<Reading, read::DhtError<E>>
     where
         P: InputPin<Error = E> + OutputPin<Error = E>,
-        E: core::fmt::Debug,
         D: DelayMs<u8> + DelayUs<u8>,
     {
         let [rh_h, rh_l, temp_h_signed, temp_l] = read::read_raw(delay, pin)?;
