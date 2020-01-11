@@ -22,7 +22,7 @@ fn main() -> ! {
 
     let mut pa1 = cortex_m::interrupt::free(|cs| pa1.into_open_drain_output(cs));
 
-    match dht11::read(&mut delay, &mut pa1) {
+    match dht11::Reading::read(&mut delay, &mut pa1) {
         Ok(dht11::Reading {
             temperature,
             relative_humidity,
