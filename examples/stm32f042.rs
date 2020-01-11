@@ -2,6 +2,7 @@
 #![no_main]
 
 use crate::hal::{delay, gpio, prelude::*, stm32};
+use cortex_m;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 use panic_halt as _;
