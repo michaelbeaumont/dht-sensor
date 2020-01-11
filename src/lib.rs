@@ -12,6 +12,12 @@ fn convert_signed(signed: u8) -> (bool, u8) {
     (sign, magnitude)
 }
 
+#[test]
+fn test_convert_signed() {
+    assert_eq!(convert_signed(0x13), (false, 0x13));
+    assert_eq!(convert_signed(0x93), (true, 0x13));
+}
+
 pub mod dht11 {
     use super::*;
 
@@ -26,16 +32,38 @@ pub mod dht11 {
         P: InputPin<Error = E> + OutputPin<Error = E>,
         D: DelayMs<u8> + DelayUs<u8>,
     {
-        let [rh, _, temp_signed, _] = read::read_raw(delay, pin)?;
+        read::read_raw(delay, pin).map(raw_to_reading)
+    }
+
+    fn raw_to_reading(bytes: [u8; 4]) -> Reading {
+        let [rh, _, temp_signed, _] = bytes;
         let temp = {
             let (signed, magnitude) = convert_signed(temp_signed);
             let temp_sign = if signed { -1 } else { 1 };
             temp_sign * magnitude as i8
         };
-        Ok(Reading {
+        Reading {
             temperature: temp,
             relative_humidity: rh,
-        })
+        }
+    }
+
+    #[test]
+    fn test_raw_to_reading() {
+        assert_eq!(
+            raw_to_reading([0x32, 0, 0x1B, 0]),
+            Reading {
+                temperature: 27,
+                relative_humidity: 50
+            }
+        );
+        assert_eq!(
+            raw_to_reading([0x80, 0, 0x83, 0]),
+            Reading {
+                temperature: -3,
+                relative_humidity: 128
+            }
+        );
     }
 }
 
@@ -53,7 +81,11 @@ pub mod dht22 {
         P: InputPin<Error = E> + OutputPin<Error = E>,
         D: DelayMs<u8> + DelayUs<u8>,
     {
-        let [rh_h, rh_l, temp_h_signed, temp_l] = read::read_raw(delay, pin)?;
+        read::read_raw(delay, pin).map(raw_to_reading)
+    }
+
+    fn raw_to_reading(bytes: [u8; 4]) -> Reading {
+        let [rh_h, rh_l, temp_h_signed, temp_l] = bytes;
         let rh = ((rh_h as u16) << 8 | (rh_l as u16)) as f32 / 10.0;
         let temp = {
             let (signed, magnitude) = convert_signed(temp_h_signed);
@@ -61,9 +93,27 @@ pub mod dht22 {
             let temp_magnitude = ((magnitude as u16) << 8) | temp_l as u16;
             temp_sign * temp_magnitude as f32 / 10.0
         };
-        Ok(Reading {
+        Reading {
             temperature: temp,
             relative_humidity: rh,
-        })
+        }
+    }
+
+    #[test]
+    fn test_raw_to_reading() {
+        assert_eq!(
+            raw_to_reading([0x02, 0x10, 0x01, 0x1B]),
+            Reading {
+                temperature: 28.3,
+                relative_humidity: 52.8
+            }
+        );
+        assert_eq!(
+            raw_to_reading([0x02, 0x90, 0x80, 0x1B]),
+            Reading {
+                temperature: -2.7,
+                relative_humidity: 65.6
+            }
+        );
     }
 }
