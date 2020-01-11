@@ -14,12 +14,18 @@ fn main() -> ! {
     let mut p = stm32::Peripherals::take().unwrap();
     let cp = stm32::CorePeripherals::take().unwrap();
     let mut rcc = p.RCC.configure().sysclk(8.mhz()).freeze(&mut p.FLASH);
+
+    // This is used by `dht-sensor` to wait for signals
     let mut delay = delay::Delay::new(cp.SYST, &rcc);
+
+    // This could be any `gpio` port
     let gpio::gpioa::Parts { pa1, .. } = p.GPIOA.split(&mut rcc);
 
+    // The DHT11 datasheet suggests 1 second
     hprintln!("Waiting on the sensor...").unwrap();
     delay.delay_ms(1000_u16);
 
+    // An `Output<OpenDrain>` is both `InputPin` and `OutputPin`
     let mut pa1 = cortex_m::interrupt::free(|cs| pa1.into_open_drain_output(cs));
 
     match dht11::Reading::read(&mut delay, &mut pa1) {

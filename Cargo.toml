@@ -1,6 +1,6 @@
 [package]
 name = "dht-sensor"
-version = "0.2.0"
+version = "0.1.0"
 description = "Driver for the DHT11/DHT22 sensor based on embedded-hal"
 authors = ["Michael Beaumont <mjboamail@gmail.com>"]
 keywords = ["embedded", "sensor", "humidity", "temperature", "embedded-hal-driver", "dht11", "dht22"]
