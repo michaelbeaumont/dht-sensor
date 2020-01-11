@@ -1,5 +1,8 @@
 # DHT11/DHT22 sensor driver
 
+[![crates.io](https://img.shields.io/crates/v/dht-sensor)](https://crates.io/crates/dht-sensor)
+[![Docs](https://docs.rs/dht-sensor/badge.svg)](https://docs.rs/dht-sensor)
+
 This library provides a platform-agnostic driver for the [DHT11 and DHT22](https://learn.adafruit.com/dht/overview) sensors.
 
 Use one of two functions `dht11::Reading::read` and `dht22::Reading::read` to get a reading.
