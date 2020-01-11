@@ -1,10 +1,7 @@
 #![no_std]
 
-use embedded_hal::blocking::delay::{DelayMs, DelayUs};
-use embedded_hal::digital::v2::{InputPin, OutputPin};
-
 mod read;
-pub use read::DhtError;
+pub use read::{Delay, DhtError, InputOutputPin};
 
 fn convert_signed(signed: u8) -> (bool, u8) {
     let sign = signed & 0x80 != 0;
@@ -29,8 +26,8 @@ pub mod dht11 {
 
     pub fn read<P, E, D>(delay: &mut D, pin: &mut P) -> Result<Reading, read::DhtError<E>>
     where
-        P: InputPin<Error = E> + OutputPin<Error = E>,
-        D: DelayMs<u8> + DelayUs<u8>,
+        P: InputOutputPin<E>,
+        D: Delay,
     {
         read::read_raw(delay, pin).map(raw_to_reading)
     }
@@ -78,8 +75,8 @@ pub mod dht22 {
 
     pub fn read<P, E, D>(delay: &mut D, pin: &mut P) -> Result<Reading, read::DhtError<E>>
     where
-        P: InputPin<Error = E> + OutputPin<Error = E>,
-        D: DelayMs<u8> + DelayUs<u8>,
+        P: InputOutputPin<E>,
+        D: Delay,
     {
         read::read_raw(delay, pin).map(raw_to_reading)
     }

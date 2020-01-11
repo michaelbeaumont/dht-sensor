@@ -13,6 +13,12 @@ impl<E> From<E> for DhtError<E> {
     }
 }
 
+pub trait Delay: DelayUs<u8> + DelayMs<u8> {}
+impl<T> Delay for T where T: DelayMs<u8> + DelayUs<u8> {}
+
+pub trait InputOutputPin<E>: InputPin<Error = E> + OutputPin<Error = E> {}
+impl<T, E> InputOutputPin<E> for T where T: InputPin<Error = E> + OutputPin<Error = E> {}
+
 fn read_bit<D, E>(delay: &mut D, pin: &impl InputPin<Error = E>) -> Result<bool, E>
 where
     D: DelayUs<u8>,
@@ -40,8 +46,8 @@ where
 
 pub fn read_raw<P, E, D>(delay: &mut D, pin: &mut P) -> Result<[u8; 4], DhtError<E>>
 where
-    P: InputPin<Error = E> + OutputPin<Error = E>,
-    D: DelayMs<u8> + DelayUs<u8>,
+    P: InputOutputPin<E>,
+    D: Delay,
 {
     pin.set_low().ok();
     delay.delay_ms(18_u8);
