@@ -19,10 +19,7 @@ impl<T> Delay for T where T: DelayMs<u8> + DelayUs<u8> {}
 pub trait InputOutputPin<E>: InputPin<Error = E> + OutputPin<Error = E> {}
 impl<T, E> InputOutputPin<E> for T where T: InputPin<Error = E> + OutputPin<Error = E> {}
 
-fn read_bit<D, E>(delay: &mut D, pin: &impl InputPin<Error = E>) -> Result<bool, E>
-where
-    D: DelayUs<u8>,
-{
+fn read_bit<E>(delay: &mut dyn Delay, pin: &impl InputPin<Error = E>) -> Result<bool, E> {
     while pin.is_low()? {}
     delay.delay_us(35u8);
     let high = pin.is_high()?;
@@ -30,10 +27,7 @@ where
     Ok(high)
 }
 
-fn read_byte<D, E>(delay: &mut D, pin: &impl InputPin<Error = E>) -> Result<u8, E>
-where
-    D: DelayUs<u8>,
-{
+fn read_byte<E>(delay: &mut dyn Delay, pin: &impl InputPin<Error = E>) -> Result<u8, E> {
     let mut byte: u8 = 0;
     for i in 0..8 {
         let bit_mask = 1 << (7 - (i % 8));
@@ -44,10 +38,9 @@ where
     Ok(byte)
 }
 
-pub fn read_raw<P, E, D>(delay: &mut D, pin: &mut P) -> Result<[u8; 4], DhtError<E>>
+pub fn read_raw<P, E>(delay: &mut dyn Delay, pin: &mut P) -> Result<[u8; 4], DhtError<E>>
 where
     P: InputOutputPin<E>,
-    D: Delay,
 {
     pin.set_low().ok();
     delay.delay_ms(18_u8);
