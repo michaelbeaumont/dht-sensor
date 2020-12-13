@@ -62,7 +62,7 @@
 //!
 //!     loop {}
 //! }
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
 mod read;
 pub use read::{Delay, DhtError, InputOutputPin};
