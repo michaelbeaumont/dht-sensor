@@ -16,3 +16,7 @@ The only prerequisites are an embedded-hal implementation that provides:
 
 See the [stm32f042 example](examples/stm32f042.rs) for a commented example of
 how to use the library.
+
+### Tests
+
+To run the tests, use something like `cargo test --lib --target x86_64-unknown-linux-gnu`.

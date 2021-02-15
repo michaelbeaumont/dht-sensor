@@ -76,18 +76,16 @@
 //!     }
 //! }
 //! ```
-//!
 
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
 mod read;
 pub use read::{Delay, DhtError, InputOutputPin};
 
 pub trait DhtReading: internal::FromRaw + Sized {
-    fn read<P, E, D>(delay: &mut D, pin: &mut P) -> Result<Self, read::DhtError<E>>
+    fn read<P, E>(delay: &mut dyn Delay, pin: &mut P) -> Result<Self, read::DhtError<E>>
     where
         P: InputOutputPin<E>,
-        D: Delay,
     {
         read::read_raw(delay, pin).map(Self::raw_to_reading)
     }
