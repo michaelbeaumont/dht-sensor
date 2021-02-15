@@ -11,13 +11,13 @@ license = "MIT"
 repository = "https://github.com/michaelbeaumont/dht-sensor"
 
 [dependencies]
-embedded-hal = "^0.2.3"
+embedded-hal = "^0.2.4"
 
 [dev-dependencies]
-stm32f0xx-hal = {version = "0.15.2", features = ["stm32f042"]}
-cortex-m = "0.6.1"
-cortex-m-rt = "0.6.11"
-cortex-m-semihosting = "0.3.5"
+stm32f0xx-hal = {version = "0.17.1", features = ["stm32f042"]}
+cortex-m = "0.6.7"
+cortex-m-rt = "0.6.13"
+cortex-m-semihosting = "0.3.7"
 panic-halt = "0.2.0"
 
 [profile.release]
