@@ -15,6 +15,14 @@
 //! - [`InputOutputPin`]-implementing type, for example an `Output<OpenDrain>` from `stm32f0xx_hal`.
 //!
 //!
+//! When initializing the pin as an output, the state of the pin might depend on the specific chip
+//! used. Some might pull the pin low by default causing the sensor to be confused when we actually
+//! read it for the first time. The same thing happens when the sensor is polled too quickly in succession.
+//! In both of those cases you will get a `DhtError::Timeout`.
+//!
+//! To avoid this, you can pull the pin high when initializing it and polling the sensor with an
+//! interval of at least 500ms (determined experimentally). Some sources state a refresh rate of 1 or even 2 seconds.
+//!
 //! ## Example
 //!
 //! See the [stm32f042 example](https://github.com/michaelbeaumont/dht-sensor/blob/master/examples/stm32f042.rs) for a working example of
@@ -44,24 +52,31 @@
 //!     // This could be any `gpio` port
 //!     let gpio::gpioa::Parts { pa1, .. } = p.GPIOA.split(&mut rcc);
 //!
+//!     // An `Output<OpenDrain>` is both `InputPin` and `OutputPin`
+//!     let mut pa1 = cortex_m::interrupt::free(|cs| pa1.into_open_drain_output(cs));
+//!     
+//!     // Pulling the pin high to avoid confusing the sensor when initializing
+//!     pa1.set_high().ok();
+//!
 //!     // The DHT11 datasheet suggests 1 second
 //!     hprintln!("Waiting on the sensor...").unwrap();
 //!     delay.delay_ms(1000_u16);
-//!
-//!     // An `Output<OpenDrain>` is both `InputPin` and `OutputPin`
-//!     let mut pa1 = cortex_m::interrupt::free(|cs| pa1.into_open_drain_output(cs));
-//!
-//!     match dht11::Reading::read(&mut delay, &mut pa1) {
-//!         Ok(dht11::Reading {
-//!             temperature,
-//!             relative_humidity,
-//!         }) => hprintln!("{}°, {}% RH", temperature, relative_humidity).unwrap(),
-//!         Err(e) => hprintln!("Error {:?}", e).unwrap(),
+//!     
+//!     loop {
+//!         match dht11::Reading::read(&mut delay, &mut pa1) {
+//!             Ok(dht11::Reading {
+//!                 temperature,
+//!                 relative_humidity,
+//!             }) => hprintln!("{}°, {}% RH", temperature, relative_humidity).unwrap(),
+//!             Err(e) => hprintln!("Error {:?}", e).unwrap(),
+//!         }
+//!         
+//!         // Delay of at least 500ms before polling the sensor again, 1 second or more advised
+//!         delay.delay_ms(500_u16);  
 //!     }
-//!     hprintln!("Looping forever now, thanks!").unwrap();
-//!
-//!     loop {}
 //! }
+//! ```
+
 #![cfg_attr(not(test), no_std)]
 
 mod read;
