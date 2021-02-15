@@ -22,21 +22,27 @@ fn main() -> ! {
     // This could be any `gpio` port
     let gpio::gpioa::Parts { pa1, .. } = p.GPIOA.split(&mut rcc);
 
+    // An `Output<OpenDrain>` is both `InputPin` and `OutputPin`
+    let mut pa1 = cortex_m::interrupt::free(|cs| pa1.into_open_drain_output(cs));
+
+    // Pulling the pin high to avoid confusing the sensor when initializing
+    pa1.set_high().ok();
+
     // The DHT11 datasheet suggests 1 second
     hprintln!("Waiting on the sensor...").unwrap();
     delay.delay_ms(1000_u16);
 
-    // An `Output<OpenDrain>` is both `InputPin` and `OutputPin`
-    let mut pa1 = cortex_m::interrupt::free(|cs| pa1.into_open_drain_output(cs));
 
-    match dht11::Reading::read(&mut delay, &mut pa1) {
-        Ok(dht11::Reading {
-            temperature,
-            relative_humidity,
-        }) => hprintln!("{}°, {}% RH", temperature, relative_humidity).unwrap(),
-        Err(e) => hprintln!("Error {:?}", e).unwrap(),
+    loop {
+        match dht11::Reading::read(&mut delay, &mut pa1) {
+            Ok(dht11::Reading {
+                temperature,
+                relative_humidity,
+            }) => hprintln!("{}°, {}% RH", temperature, relative_humidity).unwrap(),
+            Err(e) => hprintln!("Error {:?}", e).unwrap(),
+        }
+        
+        // Delay of at least 500ms before polling the sensor again, 1 second or more advised
+        delay.delay_ms(500_u16);  
     }
-    hprintln!("Looping forever now, thanks!").unwrap();
-
-    loop {}
 }

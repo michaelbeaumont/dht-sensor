@@ -15,6 +15,14 @@
 //! - [`InputOutputPin`]-implementing type, for example an `Output<OpenDrain>` from `stm32f0xx_hal`.
 //!
 //!
+//! When initializing the pin as an output, the state of the pin might depend on the specific chip
+//! used. Some might pull the pin low by default causing the sensor to be confused when we actually
+//! read it for the first time. The same thing happens when the sensor is polled too quickly in succession. 
+//! In both of those cases you will get a `DhtError::Timeout`.
+//!
+//! To avoid this, you can pull the pin high when initializing it and polling the sensor with an
+//! interval of at least 500ms (determined experimentally). Some sources state a refresh rate of 1 or even 2 seconds.
+//!
 //! ## Example
 //!
 //! See the [stm32f042 example](https://github.com/michaelbeaumont/dht-sensor/blob/master/examples/stm32f042.rs) for a working example of
@@ -44,83 +52,32 @@
 //!     // This could be any `gpio` port
 //!     let gpio::gpioa::Parts { pa1, .. } = p.GPIOA.split(&mut rcc);
 //!
+//!     // An `Output<OpenDrain>` is both `InputPin` and `OutputPin`
+//!     let mut pa1 = cortex_m::interrupt::free(|cs| pa1.into_open_drain_output(cs));
+//!     
+//!     // Pulling the pin high to avoid confusing the sensor when initializing
+//!     pa1.set_high().ok();
+//!
 //!     // The DHT11 datasheet suggests 1 second
 //!     hprintln!("Waiting on the sensor...").unwrap();
 //!     delay.delay_ms(1000_u16);
-//!
-//!     // An `Output<OpenDrain>` is both `InputPin` and `OutputPin`
-//!     let mut pa1 = cortex_m::interrupt::free(|cs| pa1.into_open_drain_output(cs));
-//!
-//!     match dht11::Reading::read(&mut delay, &mut pa1) {
-//!         Ok(dht11::Reading {
-//!             temperature,
-//!             relative_humidity,
-//!         }) => hprintln!("{}°, {}% RH", temperature, relative_humidity).unwrap(),
-//!         Err(e) => hprintln!("Error {:?}", e).unwrap(),
-//!     }
-//!     hprintln!("Looping forever now, thanks!").unwrap();
-//!
-//!     loop {}
-//! }
-//! ```
-//!
-//! ## Notes
-//! 
-//! On the bluepill (STM32F103) the pin seems to be pulled low by default causing the sensor
-//! to be confused when actually reading it for the first time. The same thing happens when
-//! the sensor is polled too quickly in succession. In this case you will get a `DhtError::Timeout`
-//!
-//! To avoid this, you can pull the pin high when initializing it and polling the sensor with an
-//! interval of at least 500ms.
-//!
-//! ```ignore, rust
-//! #![no_std]
-//! #![no_main]
-//! 
-//! use rtt_target::{rprintln, rtt_init_print};
-//! use panic_rtt_target as _;
-//! 
-//! use stm32f1xx_hal::{
-//!     prelude::*,
-//!     pac,
-//!     delay,
-//! };
-//! use cortex_m_rt::entry;
-//! use embedded_hal::digital::v2::OutputPin;
-//! use dht_sensor::{DhtReading, dht22};
-//! 
-//! #[entry]
-//! fn main() -> ! {
-//!     rtt_init_print!();
-//!     let cp = cortex_m::Peripherals::take().unwrap();
-//!     let dp = pac::Peripherals::take().unwrap();
-//! 
-//!     let mut flash = dp.FLASH.constrain();
-//!     let mut rcc = dp.RCC.constrain();
-//! 
-//!     let clocks = rcc.cfgr.freeze(&mut flash.acr);
-//! 
-//!     // This is used by `dht-sensor` to wait for signals
-//!     let mut delay = delay::Delay::new(cp.SYST, clocks);
-//!     let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
-//!     let mut dht = gpiob.pb15.into_open_drain_output(&mut gpiob.crh); 
 //!     
-//!     // Pulling the pin high to avoid confusing the sensor when initializing
-//!     dht.set_high().ok();  
-//! 
 //!     loop {
-//!         let t = dht22::Reading::read(&mut delay, &mut dht);
-//!         
-//!         match t {
-//!             Ok(r) => rprintln!("{}°C, {}%", r.temperature, r.relative_humidity),
-//!             Err(e) => rprintln!("Error: {:?}", e),
+//!         match dht11::Reading::read(&mut delay, &mut pa1) {
+//!             Ok(dht11::Reading {
+//!                 temperature,
+//!                 relative_humidity,
+//!             }) => hprintln!("{}°, {}% RH", temperature, relative_humidity).unwrap(),
+//!             Err(e) => hprintln!("Error {:?}", e).unwrap(),
 //!         }
-//! 
+//!         
 //!         // Delay of at least 500ms before polling the sensor again, 1 second or more advised
-//!         delay.delay_ms(500_u16);
+//!         delay.delay_ms(500_u16);  
 //!     }
 //! }
 //! ```
+//!
+
 #![no_std]
 
 mod read;
