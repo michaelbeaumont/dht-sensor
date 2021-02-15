@@ -24,10 +24,10 @@ fn read_bit<D, E>(delay: &mut D, pin: &impl InputPin<Error = E>) -> Result<bool,
 where
     D: DelayUs<u8>,
 {
-    while_with_timeout(delay, || pin.is_low(), 100)?;
+    wait_until_timeout(delay, || pin.is_high(), 100)?;
     delay.delay_us(35u8);
     let high = pin.is_high()?;
-    while_with_timeout(delay, || pin.is_high(), 100)?;
+    wait_until_timeout(delay, || pin.is_low(), 100)?;
     Ok(high)
 }
 
@@ -55,8 +55,8 @@ where
     pin.set_high().ok();
     delay.delay_us(48_u8);
 
-    while_with_timeout(delay, || pin.is_low(), 100)?;
-    while_with_timeout(delay, || pin.is_high(), 100)?;
+    wait_until_timeout(delay, || pin.is_high(), 100)?;
+    wait_until_timeout(delay, || pin.is_low(), 100)?;
 
     let mut data = [0; 4];
     for b in data.iter_mut() {
@@ -70,20 +70,17 @@ where
     }
 }
 
-/// Loop while the given function returns true or the timeout is reached.
-fn while_with_timeout<E, D, F>(delay: &mut D, func: F, timeout_us: u16) -> Result<(), DhtError<E>> 
+/// Wait until the given function returns true or the timeout is reached.
+fn wait_until_timeout<E, D, F>(delay: &mut D, func: F, timeout_us: u8) -> Result<(), DhtError<E>>
 where
     D: DelayUs<u8>,
-    F: Fn() -> Result<bool, E>
+    F: Fn() -> Result<bool, E>,
 {
-    let mut count = 0;
-
-    while func()? {
-        delay.delay_us(10_u8);
-        count += 1;
-        if count >= timeout_us {
-            return Err(DhtError::Timeout);
+    for _ in 0..timeout_us {
+        if func()? {
+            return Ok(());
         }
+        delay.delay_us(1_u8);
     }
-    Ok(())
+    Err(DhtError::Timeout)
 }
