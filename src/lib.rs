@@ -62,6 +62,65 @@
 //!
 //!     loop {}
 //! }
+//! ```
+//!
+//! ## Notes
+//! 
+//! On the bluepill (STM32F103) the pin seems to be pulled low by default causing the sensor
+//! to be confused when actually reading it for the first time. The same thing happens when
+//! the sensor is polled too quickly in succession. In this case you will get a `DhtError::Timeout`
+//!
+//! To avoid this, you can pull the pin high when initializing it and polling the sensor with an
+//! interval of at least 500ms.
+//!
+//! ```ignore, rust
+//! #![no_std]
+//! #![no_main]
+//! 
+//! use rtt_target::{rprintln, rtt_init_print};
+//! use panic_rtt_target as _;
+//! 
+//! use stm32f1xx_hal::{
+//!     prelude::*,
+//!     pac,
+//!     delay,
+//! };
+//! use cortex_m_rt::entry;
+//! use embedded_hal::digital::v2::OutputPin;
+//! use dht_sensor::{DhtReading, dht22};
+//! 
+//! #[entry]
+//! fn main() -> ! {
+//!     rtt_init_print!();
+//!     let cp = cortex_m::Peripherals::take().unwrap();
+//!     let dp = pac::Peripherals::take().unwrap();
+//! 
+//!     let mut flash = dp.FLASH.constrain();
+//!     let mut rcc = dp.RCC.constrain();
+//! 
+//!     let clocks = rcc.cfgr.freeze(&mut flash.acr);
+//! 
+//!     // This is used by `dht-sensor` to wait for signals
+//!     let mut delay = delay::Delay::new(cp.SYST, clocks);
+//!     let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
+//!     let mut dht = gpiob.pb15.into_open_drain_output(&mut gpiob.crh); 
+//!     
+//!     // Pulling the pin high to avoid confusing the sensor when initializing
+//!     dht.set_high().ok();  
+//! 
+//!     loop {
+//!         let t = dht22::Reading::read(&mut delay, &mut dht);
+//!         
+//!         match t {
+//!             Ok(r) => rprintln!("{}°C, {}%", r.temperature, r.relative_humidity),
+//!             Err(e) => rprintln!("Error: {:?}", e),
+//!         }
+//! 
+//!         // Delay of at least 500ms before polling the sensor again, 1 second or more advised
+//!         delay.delay_ms(500_u16);
+//!     }
+//! }
+//! ```
 #![no_std]
 
 mod read;
