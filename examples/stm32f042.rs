@@ -31,7 +31,6 @@ fn main() -> ! {
     hprintln!("Waiting on the sensor...").unwrap();
     delay.delay_ms(1000_u16);
 
-
     loop {
         match dht11::Reading::read(&mut delay, &mut pa1) {
             Ok(dht11::Reading {
@@ -40,8 +39,8 @@ fn main() -> ! {
             }) => hprintln!("{}°, {}% RH", temperature, relative_humidity).unwrap(),
             Err(e) => hprintln!("Error {:?}", e).unwrap(),
         }
-        
+
         // Delay of at least 500ms before polling the sensor again, 1 second or more advised
-        delay.delay_ms(500_u16);  
+        delay.delay_ms(500_u16);
     }
 }

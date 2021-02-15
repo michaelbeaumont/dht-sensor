@@ -17,7 +17,7 @@
 //!
 //! When initializing the pin as an output, the state of the pin might depend on the specific chip
 //! used. Some might pull the pin low by default causing the sensor to be confused when we actually
-//! read it for the first time. The same thing happens when the sensor is polled too quickly in succession. 
+//! read it for the first time. The same thing happens when the sensor is polled too quickly in succession.
 //! In both of those cases you will get a `DhtError::Timeout`.
 //!
 //! To avoid this, you can pull the pin high when initializing it and polling the sensor with an
