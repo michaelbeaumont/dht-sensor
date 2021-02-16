@@ -35,6 +35,19 @@ jobs:
         with:
           command: clippy
           args: --all-features -- -D warnings
+  package:
+    name: Cargo package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: package
   build_and_test:
     name: Build and test
     runs-on: ubuntu-latest
