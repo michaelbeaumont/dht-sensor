@@ -9,6 +9,13 @@ edition = "2018"
 readme = "README.md"
 license = "MIT"
 repository = "https://github.com/michaelbeaumont/dht-sensor"
+exclude = [
+  ".github",
+  "nucleo.cfg",
+  "openocd.gdb",
+  "memory.x",
+  ".gitignore",
+]
 
 [dependencies]
 embedded-hal = "^0.2.4"
