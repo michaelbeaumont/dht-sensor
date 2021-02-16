@@ -14,7 +14,6 @@
 //! - [`Delay`]-implementing type, for example Cortex-M microcontrollers typically use the `SysTick`.
 //! - [`InputOutputPin`]-implementing type, for example an `Output<OpenDrain>` from `stm32f0xx_hal`.
 //!
-//!
 //! When initializing the pin as an output, the state of the pin might depend on the specific chip
 //! used. Some might pull the pin low by default causing the sensor to be confused when we actually
 //! read it for the first time. The same thing happens when the sensor is polled too quickly in succession.
@@ -76,7 +75,6 @@
 //!     }
 //! }
 //! ```
-
 #![cfg_attr(not(test), no_std)]
 
 mod read;
