@@ -29,12 +29,12 @@
 //!    export HAL=stm32f4xx MCU=stm32f401   TARGET=thumbv7em-none-eabihf PROC=stm32f4x  # blackpill-stm32f401 Cortex-M4
 //!    export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf PROC=stm32f4x  # blackpill-stm32f411 Cortex-M4
 //!    export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf PROC=stm32f4x  # nucleo-64	      Cortex-M4
-//! xxx   export HAL=stm32f7xx MCU=stm32f722   TARGET=thumbv7em-none-eabihf                # none-stm32f722      Cortex-M7
+//!    hal NOT compiling as of (Feb 2021) export HAL=stm32f7xx MCU=stm32f722 TARGET=thumbv7em-none-eabihf #none-stm32f722 Cortex-M7
 //!    export HAL=stm32h7xx MCU=stm32h742   TARGET=thumbv7em-none-eabihf                # none-stm32h742      Cortex-M7
 //!    export HAL=stm32l0xx MCU=stm32l0x2   TARGET=thumbv6m-none-eabi	 PROC=stm32l1   # none-stm32l0x2      Cortex-M0
 //!    export HAL=stm32l1xx MCU=stm32l100   TARGET=thumbv7m-none-eabi	                # discovery-stm32l100 Cortex-M3
 //!    export HAL=stm32l1xx MCU=stm32l151   TARGET=thumbv7m-none-eabi	 PROC=stm32l1   # heltec-lora-node151 Cortex-M3
-//!    export HAL=stm32l4xx MCU=stm32l4x2   TARGET=thumbv7em-none-eabi                  # none-stm32l4x1      Cortex-M4
+//!    NOT compiling as of (Feb 2021) export HAL=stm32l4xx MCU=stm32l4x2   TARGET=thumbv7em-none-eabi                  # none-stm32l4x1      Cortex-M4
 //!  
 //!  Depending on the MCU connection to the computer, in the  openocd command use
 //!    export INTERFACE=stlink-v2  
@@ -61,6 +61,8 @@ use cortex_m_semihosting::hprintln;
 
 //https://github.com/michaelbeaumont/dht-sensor
 use dht_sensor::*;
+use dht_sensor::dht11::Reading;
+//use dht_sensor::dht22::Reading;
 
 //use crate::hal::{delay, gpio, prelude::*, stm32};
 
@@ -389,9 +391,9 @@ fn main() -> ! {
     
     // single read before loop for debugging purposes
     //
-    //let r = dht11::Reading::read(&mut delay, &mut dht_data);
+    //let r = Reading::read(&mut delay, &mut dht_data);
     //match r {
-    //	Ok(dht11::Reading {
+    //	Ok(Reading {
     //	    temperature,
     //	    relative_humidity,
     //	}) => hprintln!("{} deg C, {}% RH", temperature, relative_humidity).unwrap(),
@@ -399,8 +401,8 @@ fn main() -> ! {
     //}
 
     loop {
-        match dht11::Reading::read(&mut delay, &mut dht_data) {
-            Ok(dht11::Reading {
+        match Reading::read(&mut delay, &mut dht_data) {
+            Ok(Reading {
                 temperature,
                 relative_humidity,
             }) => hprintln!("{} deg C, {}% RH", temperature, relative_humidity).unwrap(),

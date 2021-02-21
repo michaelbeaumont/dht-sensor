@@ -1,6 +1,6 @@
 // following https://doc.rust-lang.org/cargo/reference/build-scripts.html
 use std::env;
-use std::io::Write;         //needed for debugging
+//use std::io::Write;         //needed for debugging
 //use std::path::PathBuf;     //needed for one approach
 //use std::fs;                //needed for one approach
 
@@ -10,9 +10,10 @@ fn main() {
     // proper memory.x file for the MCU. The memory.x files are assumed to be in a
     // directory memoryMaps/xxx/  where xxx is replaced by an one of 
 
-    let mcus = ["STM32F042", "STM32F401", "STM32F030", "STM32F100", "STM32F103", "STM32F722", 
-         "STML100", "LM3S6965", "STM32F101", "STM32F303", "STM32F411", "STM32H742", "STML151", 
-	 "GD32VF103CB", "GD32VF103C8", "GD32VF103_EXTRA" ];
+    let mcus = ["STM32F042", "STM32F030XC", "STM32F100", "STM32F101", "STM32F103", "STM32F303XC", 
+         "STM32F401", "STM32F411", "STM32F722",  
+	 "STM32H742", "STM32L0X2", "STM32L100", "STM32L151", "STM32L4X2", 
+	 "LM3S6965", "GD32VF103CB", "GD32VF103C8", "GD32VF103_EXTRA" ];
 
     // For example,   memoryMaps/STM32F401/memory.x
     // Note that the MCU string must be in upper case because it is also used to 
@@ -29,7 +30,7 @@ fn main() {
     // different memory layouts.
     
     // The memoryNote.txt file is just to record some debugging information
-    let mut df = std::fs::File::create("memoryNote.txt").unwrap();
+    //let mut df = std::fs::File::create("memoryNote.txt").unwrap();
 
     // It is assumed that only one MCU feature will be specified. If there are more then 
     // only the first is found (but actual code may be a mess if cargo really lets you do that).
