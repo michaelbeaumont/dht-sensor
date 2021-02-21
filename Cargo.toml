@@ -23,8 +23,8 @@ name = "stm32f042"
 path = "examples/stm32f042.rs"
 
 [[example]]
-name = "dht11-multi-hals"
-path = "examples/dht11-multi-hals.rs"
+name = "dht-multi-hals"
+path = "examples/dht-multi-hals.rs"
 
 [dependencies]
 embedded-hal = "^0.2.4"
@@ -65,7 +65,7 @@ stm32l4xx = []
 #cargo  build --target thumbv6m-none-eabi  --example stm32f042  --release  --features stm32f042
 stm32f042   = ["stm32f0xx-hal/stm32f042"]
 
-#cargo  build --target $TARGET --features $HAL,$MCU --example dht11-multi-hals [ --release ]
+#cargo  build --target $TARGET --features $HAL,$MCU --example dht-multi-hals [ --release ]
 stm32f030xc = ["stm32f0xx-hal/stm32f030xc", "stm32f0xx-hal/rt"]
 stm32f100   = ["stm32f1xx-hal/stm32f100",   "stm32f1xx-hal/rt"]
 stm32f101   = ["stm32f1xx-hal/stm32f101",   "stm32f1xx-hal/rt"]

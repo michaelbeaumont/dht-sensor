@@ -1,20 +1,23 @@
-//!  Measure the temperature and humidity from a DHT11 sensor and print
+//!  Measure the temperature and humidity from a DHT11 or DHT22 sensor and print
 //!  with hprintln (to a gdb session).
-//!  The DHT11 data pin is connectted to pin A8 on the MCU board and has 
+//!  The DHT data pin is connected to pin A8 on the MCU board and has 
 //!  a pull up resistor. (18K ohms used in some testing.)
 //!  The largest part of this file is the setup() functions used for each hal. 
 //!  These make the application code common.
 
-//!  This examples compiles with hals ...
-//!  It has been tested to run with ...
+//!  This examples has been tested to run with ...
 //!  In linux with environment variables as below the example can be compiled, loaded and 
 //!  run using gdb and openocd
 //!  	openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg 
 //!  In another window do
-//!  	cargo  run --target $TARGET --features $HAL,$MCU --example dht11-multi-hals
+//!  	cargo  run --target $TARGET --features $HAL,$MCU --example dht-multi-hals
+//!  or if a DHT22 sensor is used
+//!  	cargo  run --target $TARGET --features $HAL,$MCU,dht22 --example dht-multi-hals
 //!  
 //!  To only compile use
-//!  	cargo  build --target $TARGET --features $HAL,$MCU --example dht11-multi-hals
+//!  	cargo  build --target $TARGET --features $HAL,$MCU --example dht-multi-hals
+//!  or 
+//!  	cargo  build --target $TARGET --features $HAL,$MCU,dht22 --example dht-multi-hals
 //!
 //!  In the case of an error  '.rodata will not fit in region FLASH ' add ' --release' to the command.
 //!
@@ -107,7 +110,7 @@ use stm32f0xx_hal::{prelude::*,
 
        let mut delay = Delay::new(cp.SYST, &rcc);
 
-       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       //  1 second delay (for DHT setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
       
        (pa8, delay)                 //DHT data will be on A8
@@ -141,7 +144,7 @@ use stm32f1xx_hal::{prelude::*,
        // Pulling the pin high to avoid confusing the sensor when initializing.
        pa8.set_high().ok(); 
  
-       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       //  1 second delay (for DHT setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
       
        (pa8, delay)                //DHT data will be on A8
@@ -172,7 +175,7 @@ use stm32f3xx_hal::{prelude::*,
        // delay is used by `dht-sensor` to wait for signals
        let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
 
-       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       //  1 second delay (for DHT setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
        
        (pa8, delay)                  //DHT data will be on A8
@@ -210,7 +213,7 @@ use stm32f4xx_hal::{prelude::*,
        let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
 
 
-       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       //  1 second delay (for DHT setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
 
        (pa8, delay)                  //DHT data will be on A8
@@ -239,7 +242,7 @@ use stm32f7xx_hal::{prelude::*,
        // delay is used by `dht-sensor` to wait for signals
        let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
 
-       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       //  1 second delay (for DHT setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
 
        (pa8, delay)                 //DHT data will be on A8
@@ -272,7 +275,7 @@ use stm32h7xx_hal::{prelude::*,
        // delay is used by `dht-sensor` to wait for signals
        let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
 
-       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       //  1 second delay (for DHT setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
 
        (pa8, delay)                   //DHT data will be on A8
@@ -307,7 +310,7 @@ use stm32l0xx_hal::{prelude::*,
        //let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
        let mut delay = cp.SYST.delay(rcc.clocks);
 
-       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       //  1 second delay (for DHT setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
 
        (pa8, delay)                //DHT data will be on A8
@@ -340,7 +343,7 @@ use stm32l1xx_hal::{prelude::*,
           
        let mut delay = cp.SYST.delay(rcc.clocks);
 
-       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       //  1 second delay (for DHT setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
    
        (pa8,  delay)                  //DHT data will be on A8
@@ -376,7 +379,7 @@ use stm32l4xx_hal::{prelude::*,
        // delay is used by `dht-sensor` to wait for signals
        let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
 
-       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       //  1 second delay (for DHT setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
 
        (pa8, delay)                   //DHT data will be on A8
