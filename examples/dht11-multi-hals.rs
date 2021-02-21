@@ -21,15 +21,15 @@
 //!                cargo run  environment variables                        openocd        test board and processor
 //!    _____________________________________________________________     _____________   ___________________________
 //!    export HAL=stm32f0xx MCU=stm32f042   TARGET=thumbv6m-none-eabi	 PROC=stm32f0x  # none-stm32f042      Cortex-M0
-//!    export HAL=stm32f0xx MCU=stm32f030xc TARGET=thumbv6m-none-eabi	 PROC=stm32f0x  # none-stm32f030      Cortex-M0
+//! xx   export HAL=stm32f0xx MCU=stm32f030xc TARGET=thumbv6m-none-eabi	 PROC=stm32f0x  # none-stm32f030      Cortex-M0
 //!    export HAL=stm32f1xx MCU=stm32f103   TARGET=thumbv7m-none-eabi	 PROC=stm32f1x  # bluepill	      Cortex-M3
 //!    export HAL=stm32f1xx MCU=stm32f100   TARGET=thumbv7m-none-eabi	 PROC=stm32f1x  # none-stm32f100      Cortex-M3
 //!    export HAL=stm32f1xx MCU=stm32f101   TARGET=thumbv7m-none-eabi	 PROC=stm32f1x  # none-stm32f101      Cortex-M3
-//!    export HAL=stm32f3xx MCU=stm32f303xc TARGET=thumbv7em-none-eabihf PROC=stm32f3x  # discovery-stm32f303 Cortex-M3
+//! xx   export HAL=stm32f3xx MCU=stm32f303xc TARGET=thumbv7em-none-eabihf PROC=stm32f3x  # discovery-stm32f303 Cortex-M3
 //!    export HAL=stm32f4xx MCU=stm32f401   TARGET=thumbv7em-none-eabihf PROC=stm32f4x  # blackpill-stm32f401 Cortex-M4
 //!    export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf PROC=stm32f4x  # blackpill-stm32f411 Cortex-M4
 //!    export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf PROC=stm32f4x  # nucleo-64	      Cortex-M4
-//!    export HAL=stm32f7xx MCU=stm32f722   TARGET=thumbv7em-none-eabihf                # none-stm32f722      Cortex-M7
+//! xxx   export HAL=stm32f7xx MCU=stm32f722   TARGET=thumbv7em-none-eabihf                # none-stm32f722      Cortex-M7
 //!    export HAL=stm32h7xx MCU=stm32h742   TARGET=thumbv7em-none-eabihf                # none-stm32h742      Cortex-M7
 //!    export HAL=stm32l0xx MCU=stm32l0x2   TARGET=thumbv6m-none-eabi	 PROC=stm32l1   # none-stm32l0x2      Cortex-M0
 //!    export HAL=stm32l1xx MCU=stm32l100   TARGET=thumbv7m-none-eabi	                # discovery-stm32l100 Cortex-M3

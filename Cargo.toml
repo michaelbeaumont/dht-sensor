@@ -67,35 +67,19 @@ stm32f030xc = ["stm32f0xx-hal/stm32f030xc", "stm32f0xx-hal/rt"]
 stm32f100   = ["stm32f1xx-hal/stm32f100",   "stm32f1xx-hal/rt"]
 stm32f101   = ["stm32f1xx-hal/stm32f101",   "stm32f1xx-hal/rt"]
 stm32f103   = ["stm32f1xx-hal/stm32f103",   "stm32f1xx-hal/rt"]        #  these may not need   ,"stm32f1xx-hal/rt"]
-#stm32f303xc = ["stm32f3xx-hal/stm32f303xc", "stm32f3xx-hal/rt"] 
-stm32f401 = ["stm32f4xx-hal/stm32f401", "stm32f4xx-hal/rt"] 
-stm32f405 = ["stm32f4xx-hal/stm32f405", "stm32f4xx-hal/rt"] 
-stm32f411 = ["stm32f4xx-hal/stm32f411", "stm32f4xx-hal/rt"] 
-#stm32f722 = ["stm32f7xx-hal/stm32f722", "stm32f7xx-hal/rt"] 
-#stm32h742 = ["stm32h7xx-hal/stm32h742", "stm32h7xx-hal/rt"]
-#stm32l0x2 = ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L072KZTx"]
-#stm32l0x1 = ["stm32l0xx-hal/stm32l0x1", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L071KBTx"]
-#stm32l100 = ["stm32l1xx-hal/stm32l100", "stm32l1xx-hal/rt"]
-#stm32l151 = ["stm32l1xx-hal/stm32l151", "stm32l1xx-hal/rt"]
-#stm32l4x1 = ["stm32l4xx-hal/stm32l4x1", "stm32l4xx-hal/rt"]
-#stm32l4x2 = ["stm32l4xx-hal/stm32l4x2", "stm32l4xx-hal/rt"]
+stm32f303xc = ["stm32f3xx-hal/stm32f303xc", "stm32f3xx-hal/rt"] 
+stm32f401   = ["stm32f4xx-hal/stm32f401", "stm32f4xx-hal/rt"] 
+stm32f405   = ["stm32f4xx-hal/stm32f405", "stm32f4xx-hal/rt"] 
+stm32f411   = ["stm32f4xx-hal/stm32f411", "stm32f4xx-hal/rt"] 
+stm32f722   = ["stm32f7xx-hal/stm32f722", "stm32f7xx-hal/rt"] 
+stm32h742   = ["stm32h7xx-hal/stm32h742", "stm32h7xx-hal/rt"]
+stm32l0x2   = ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L072KZTx"]
+stm32l0x1   = ["stm32l0xx-hal/stm32l0x1", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L071KBTx"]
+stm32l100   = ["stm32l1xx-hal/stm32l100", "stm32l1xx-hal/rt"]
+stm32l151   = ["stm32l1xx-hal/stm32l151", "stm32l1xx-hal/rt"]
+stm32l4x1   = ["stm32l4xx-hal/stm32l4x1", "stm32l4xx-hal/rt"]
+stm32l4x2   = ["stm32l4xx-hal/stm32l4x2", "stm32l4xx-hal/rt"]
 
-
-##The key functionality (rustc-link-search) is only for overriding build scripts. 
-## It does not seem to work when there is no build script (link="build.rs" in [package])
-## but rustflags should (but may need "cargo rustc ..." in place of "cargo build ..."?).
-
-#[target.thumbv6m-none-eabi.stm32f042]
-##rustc-link-search = ["memoryMaps/stm32f042"]
-#rustflags = ["-C", "link-arg=-Tlink.x", "-L", "memoryMaps/stm32f042" ]
-
-#[target.thumbv7em-none-eabihf.stm32f411]
-#[[target.thumbv7em-none-eabihf]
-#[rustc-link-search = ["memoryMaps/stm32f042"]
-#[rustflags = ["-C", "link-arg=-Tlink.x" ]
-
-#[target.thumbv7m-none-eabi.stm32f103]
-#rustflags = ["-C", "link-arg=-Tlink.x", "-L", "memoryMaps/stm32f103" ]
 
 [profile.release]
 codegen-units = 1
