@@ -61,8 +61,12 @@ use cortex_m_semihosting::hprintln;
 
 //https://github.com/michaelbeaumont/dht-sensor
 use dht_sensor::*;
+
+#[cfg(feature = "dht22")]
+use dht_sensor::dht22::Reading;
+
+#[cfg(not(feature = "dht22"))]
 use dht_sensor::dht11::Reading;
-//use dht_sensor::dht22::Reading;
 
 //use crate::hal::{delay, gpio, prelude::*, stm32};
 
