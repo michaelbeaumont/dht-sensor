@@ -6,8 +6,8 @@
 //!  These make the application code common.
 
 //!  This examples has been tested to run with both DHT11 and DHT22 on bluepill (stm32f103), 
-//!  blackpill-stm32f401, and  blackpill-stm32f411. As of Feb. 2021 there are known
-//!  runtime error on
+//!  blackpill-stm32f401, and  blackpill-stm32f411. As of Feb. 22 2021 there are known
+//!  runtime errors on
 //!  discovery-stm32f303 reads both DHT11 and DHT22  once but then fails at delay.
 //!  discovery-stm32l100 gives Error Timeout with both DHT11 and DHT22. 
 //!
