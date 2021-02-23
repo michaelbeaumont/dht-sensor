@@ -10,12 +10,6 @@ jobs:
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        #mcu: [stm32f042, stm32f030xc, stm32f103, stm32f100, stm32f101, stm32f303xc,
-        #      stm32f401, stm32f411, stm32h742, stm32l0x2, stm32l100, stm32l151]
-        mcu: [stm32f042, stm32f103, stm32f401, stm32f411]
-        dht: [dht11, dht22]
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -40,7 +34,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --features ${{ matrix.mcu }},${{ matrix.dht }} -- -D warnings
+          args: --features stm32f042,dht11 -- -D warnings
   package:
     name: Cargo package
     runs-on: ubuntu-latest
@@ -58,6 +52,12 @@ jobs:
   build_and_test:
     name: Build and test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        #mcu: [stm32f042, stm32f030xc, stm32f103, stm32f100, stm32f101, stm32f303xc,
+        #      stm32f401, stm32f411, stm32h742, stm32l0x2, stm32l100, stm32l151]
+        mcu: [stm32f042, stm32f103, stm32f401, stm32f411]
+        dht: [dht11, dht22]
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -69,12 +69,18 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --features stm32f042
-      - name: Build example
+          args: --release --features ${{ matrix.mcu }},${{ matrix.dht }}
+      - name: Build example stm32f042
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --example stm32f042 --target thumbv6m-none-eabi
+          args: --release --target thumbv6m-none-eabi --features stm32f042 --example stm32f042
+          use-cross: true
+      - name: Build example dht-multi-hals
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target thumbv7em-none-eabihf --features stm32f411 --example dht-multi-hals
           use-cross: true
       - name: Test
         uses: actions-rs/cargo@v1
