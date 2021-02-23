@@ -73,10 +73,11 @@ fn main() {
     // searched for in the package root.
 
     let mut indir: String = "".to_string();
+    let d = "memoryMaps/".to_owned();
     for m in &mcus {
         let v = env::var_os(pre.clone() + m);
         if v.is_some() {
-            indir = "memoryMaps/".clone().to_owned() + m;
+            indir = d + m;
             break;
         };
     }
@@ -85,7 +86,7 @@ fn main() {
     // This allows 'cargo build  --features $MCU ' to work
     // but do not expect to compile examples. (There will be a 'cannot find linker script memory.x' error.)
 
-    if indir != "".to_string() {
+    if indir != "" {
         //df.write(format!("in mcu found condition.\n").as_bytes()).unwrap();
         let infile = indir.clone() + "/memory.x";
 
