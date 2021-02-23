@@ -86,7 +86,7 @@ fn main() {
     // This allows 'cargo build  --features $MCU ' to work
     // but do not expect to compile examples. (There will be a 'cannot find linker script memory.x' error.)
 
-    if indir != "" {
+    if !indir.is_empty() {
         //df.write(format!("in mcu found condition.\n").as_bytes()).unwrap();
         let infile = indir.clone() + "/memory.x";
 
