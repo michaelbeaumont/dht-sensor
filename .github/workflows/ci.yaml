@@ -55,7 +55,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: package
-	  args: --features stm32f042
+          args: --features stm32f042
   build_and_test:
     name: Build and test
     runs-on: ubuntu-latest
