@@ -6,6 +6,13 @@ on:
       - main
   pull_request: {}
 
+strategy:
+  matrix:
+    #mcu: [stm32f042, stm32f030xc, stm32f103, stm32f100, stm32f101, stm32f303xc,
+    #      stm32f401, stm32f411, stm32h742, stm32l0x2, stm32l100, stm32l151]
+    mcu: [stm32f042, stm32f103, stm32f401, stm32f411]
+    dht: [dht11, dht22]
+
 jobs:
   fmt:
     name: Rustfmt
@@ -34,7 +41,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --all-features -- -D warnings
+          args: --features ${{ matrix.mcu }},${{ matrix.dht }} -- -D warnings
   package:
     name: Cargo package
     runs-on: ubuntu-latest
@@ -48,6 +55,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: package
+	  args: --features stm32f042
   build_and_test:
     name: Build and test
     runs-on: ubuntu-latest
@@ -62,7 +70,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --all-features
+          args: --release --features stm32f042
       - name: Build example
         uses: actions-rs/cargo@v1
         with:
