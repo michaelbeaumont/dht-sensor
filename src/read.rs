@@ -56,7 +56,7 @@ where
         *b = read_byte(delay, pin)?;
     }
     let checksum = read_byte(delay, pin)?;
-    if data.iter().sum::<u8>() != checksum {
+    if data.iter().fold(0u8, |sum, v| sum.wrapping_add(*v)) != checksum {
         Err(DhtError::ChecksumMismatch)
     } else {
         Ok(data)
