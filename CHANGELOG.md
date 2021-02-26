@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+### Fixes
+
+* Fix add with overflow for debug builds (#6)
+
 ## 0.2.0
 
 ### Features
