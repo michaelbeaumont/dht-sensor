@@ -23,7 +23,7 @@ jobs:
           script: |
             const fs = require("fs").promises;
 
-            const currentVersionChangesRegex = /## ${{ steps.version.outputs.version }}$(.*)$\n##/ms;
+            const currentVersionChangesRegex = /## ${{ steps.version.outputs.version }}$(.*?)$\n##[^#]/ms;
 
             const changelog = await fs.readFile("CHANGELOG.md", "utf8");
             const changes = changelog.match(currentVersionChangesRegex)[1].trim();
