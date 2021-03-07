@@ -77,11 +77,16 @@
 //! ```
 #![cfg_attr(not(test), no_std)]
 
+mod error;
+mod pin;
 mod read;
-pub use read::{Delay, DhtError, InputOutputPin};
+
+pub use error::DhtError;
+pub use pin::InputOutputPin;
+pub use read::Delay;
 
 pub trait DhtReading: internal::FromRaw + Sized {
-    fn read<P, E>(delay: &mut dyn Delay, pin: &mut P) -> Result<Self, read::DhtError<E>>
+    fn read<P, E>(delay: &mut dyn Delay, pin: &mut P) -> Result<Self, DhtError<E>>
     where
         P: InputOutputPin<E>,
     {
