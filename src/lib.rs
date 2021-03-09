@@ -77,11 +77,24 @@
 //! ```
 #![cfg_attr(not(test), no_std)]
 
+mod error;
+mod pin;
 mod read;
-pub use read::{Delay, DhtError, InputOutputPin};
+
+#[cfg(feature = "async")]
+mod read_async;
+
+#[cfg(feature = "async")]
+use core::pin::Pin;
+#[cfg(feature = "async")]
+use embassy::traits::{delay, gpio::*};
+
+pub use error::DhtError;
+pub use pin::InputOutputPin;
+pub use read::Delay;
 
 pub trait DhtReading: internal::FromRaw + Sized {
-    fn read<P, E>(delay: &mut dyn Delay, pin: &mut P) -> Result<Self, read::DhtError<E>>
+    fn read<P, E>(delay: &mut dyn Delay, pin: &mut P) -> Result<Self, DhtError<E>>
     where
         P: InputOutputPin<E>,
     {
@@ -120,6 +133,17 @@ pub mod dht11 {
     }
 
     impl DhtReading for Reading {}
+
+    #[cfg(feature = "async")]
+    pub async fn read<E, D, T>(delay: Pin<&mut D>, pin: Pin<&mut T>) -> Result<Reading, DhtError<E>>
+    where
+        D: delay::Delay,
+        T: Unpin + WaitForHigh + WaitForLow + InputOutputPin<E>,
+    {
+        read_async::read_raw(delay, pin)
+            .await
+            .map(<Reading as internal::FromRaw>::raw_to_reading)
+    }
 
     #[test]
     fn test_raw_to_reading() {
@@ -169,6 +193,17 @@ pub mod dht22 {
     }
 
     impl DhtReading for Reading {}
+
+    #[cfg(feature = "async")]
+    pub async fn read<E, D, T>(delay: Pin<&mut D>, pin: Pin<&mut T>) -> Result<Reading, DhtError<E>>
+    where
+        D: delay::Delay,
+        T: Unpin + WaitForHigh + WaitForLow + InputOutputPin<E>,
+    {
+        read_async::read_raw(delay, pin)
+            .await
+            .map(<Reading as internal::FromRaw>::raw_to_reading)
+    }
 
     #[test]
     fn test_raw_to_reading() {

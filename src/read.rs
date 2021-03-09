@@ -1,24 +1,11 @@
 use embedded_hal::blocking::delay::{DelayMs, DelayUs};
-use embedded_hal::digital::v2::{InputPin, OutputPin};
+use embedded_hal::digital::v2::InputPin;
 
-#[derive(Debug)]
-pub enum DhtError<E> {
-    PinError(E),
-    ChecksumMismatch,
-    Timeout,
-}
-
-impl<E> From<E> for DhtError<E> {
-    fn from(error: E) -> DhtError<E> {
-        DhtError::PinError(error)
-    }
-}
+use crate::error::*;
+use crate::pin::*;
 
 pub trait Delay: DelayUs<u8> + DelayMs<u8> {}
 impl<T> Delay for T where T: DelayMs<u8> + DelayUs<u8> {}
-
-pub trait InputOutputPin<E>: InputPin<Error = E> + OutputPin<Error = E> {}
-impl<T, E> InputOutputPin<E> for T where T: InputPin<Error = E> + OutputPin<Error = E> {}
 
 fn read_bit<E>(delay: &mut dyn Delay, pin: &impl InputPin<Error = E>) -> Result<bool, DhtError<E>> {
     wait_until_timeout(delay, || pin.is_high(), 100)?;
