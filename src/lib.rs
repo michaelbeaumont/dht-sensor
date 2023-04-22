@@ -80,6 +80,9 @@
 mod read;
 pub use read::{Delay, DhtError, InputOutputPin};
 
+#[cfg(feature = "async")]
+use embedded_hal_async::delay::DelayUs;
+
 pub mod dht11 {
     use super::*;
 
@@ -89,12 +92,23 @@ pub mod dht11 {
         pub relative_humidity: u8,
     }
 
+    #[cfg(not(feature = "async"))]
     pub fn read<E>(
         delay: &mut impl Delay,
         pin: &mut impl InputOutputPin<E>,
     ) -> Result<Reading, read::DhtError<E>> {
         pin.set_low()?;
         delay.delay_ms(18);
+        read::read_raw(delay, pin).map(raw_to_reading)
+    }
+
+    #[cfg(feature = "async")]
+    pub async fn read<E>(
+        delay: &mut (impl Delay + DelayUs),
+        pin: &mut impl InputOutputPin<E>,
+    ) -> Result<Reading, read::DhtError<E>> {
+        pin.set_low()?;
+        DelayUs::delay_ms(delay, 18).await;
         read::read_raw(delay, pin).map(raw_to_reading)
     }
 
@@ -139,12 +153,23 @@ pub mod dht22 {
         pub relative_humidity: f32,
     }
 
+    #[cfg(not(feature = "async"))]
     pub fn read<E>(
         delay: &mut impl Delay,
         pin: &mut impl InputOutputPin<E>,
     ) -> Result<Reading, read::DhtError<E>> {
         pin.set_low()?;
         delay.delay_ms(1);
+        read::read_raw(delay, pin).map(raw_to_reading)
+    }
+
+    #[cfg(feature = "async")]
+    pub async fn read<E>(
+        delay: &mut (impl Delay + DelayUs),
+        pin: &mut impl InputOutputPin<E>,
+    ) -> Result<Reading, read::DhtError<E>> {
+        pin.set_low()?;
+        DelayUs::delay_ms(delay, 1).await;
         read::read_raw(delay, pin).map(raw_to_reading)
     }
 
