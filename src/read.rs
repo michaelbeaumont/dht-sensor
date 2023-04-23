@@ -1,8 +1,6 @@
 use embedded_hal::blocking::delay::{DelayMs, DelayUs};
 use embedded_hal::digital::v2::{InputPin, OutputPin};
 
-const TIMEOUT: u16 = 1000;
-
 #[derive(Debug)]
 pub enum DhtError<E> {
     PinError(E),
@@ -23,10 +21,10 @@ pub trait InputOutputPin<E>: InputPin<Error = E> + OutputPin<Error = E> {}
 impl<T, E> InputOutputPin<E> for T where T: InputPin<Error = E> + OutputPin<Error = E> {}
 
 fn read_bit<E>(delay: &mut dyn Delay, pin: &impl InputPin<Error = E>) -> Result<bool, DhtError<E>> {
-    wait_until_timeout(delay, || pin.is_high())?;
+    wait_until_timeout(delay, || pin.is_high(), 100)?;
     delay.delay_us(35u8);
     let high = pin.is_high()?;
-    wait_until_timeout(delay, || pin.is_low())?;
+    wait_until_timeout(delay, || pin.is_low(), 100)?;
     Ok(high)
 }
 
@@ -50,8 +48,8 @@ where
     pin.set_high().ok();
     delay.delay_us(48_u8);
 
-    wait_until_timeout(delay, || pin.is_high())?;
-    wait_until_timeout(delay, || pin.is_low())?;
+    wait_until_timeout(delay, || pin.is_high(), 100)?;
+    wait_until_timeout(delay, || pin.is_low(), 100)?;
 
     let mut data = [0; 4];
     for b in data.iter_mut() {
@@ -66,11 +64,15 @@ where
 }
 
 /// Wait until the given function returns true or the timeout is reached.
-fn wait_until_timeout<E, F>(delay: &mut dyn Delay, func: F) -> Result<(), DhtError<E>>
+fn wait_until_timeout<E, F>(
+    delay: &mut dyn Delay,
+    func: F,
+    timeout_us: u8,
+) -> Result<(), DhtError<E>>
 where
     F: Fn() -> Result<bool, E>,
 {
-    for _ in 0..TIMEOUT {
+    for _ in 0..timeout_us {
         if func()? {
             return Ok(());
         }
