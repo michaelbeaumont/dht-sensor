@@ -34,6 +34,21 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
+          args: -- -D warnings
+  clippy_nightly:
+    name: Clippy (nightly)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          components: clippy
+      - uses: actions-rs/cargo@v1
+        with:
+          toolchain: nightly
+          command: clippy
           args: --all-features -- -D warnings
   package:
     name: Cargo package
@@ -62,7 +77,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --all-features
+          args: --release
       - name: Build example
         uses: actions-rs/cargo@v1
         with:
@@ -72,5 +87,34 @@ jobs:
       - name: Test
         uses: actions-rs/cargo@v1
         with:
+          command: test
+          args: --lib
+  build_and_test_nightly:
+    name: Build and test (nightly)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          target: thumbv6m-none-eabi
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: nightly
+          command: build
+          args: --release --all-features
+      - name: Build example
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: nightly
+          command: build
+          args: --release --example stm32f042 --target thumbv6m-none-eabi
+          use-cross: true
+      - name: Test
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: nightly
           command: test
           args: --lib
