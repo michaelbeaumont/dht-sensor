@@ -47,6 +47,7 @@ jobs:
           components: clippy
       - uses: actions-rs/cargo@v1
         with:
+          toolchain: nightly
           command: clippy
           args: --all-features -- -D warnings
   package:
@@ -101,16 +102,19 @@ jobs:
       - name: Build
         uses: actions-rs/cargo@v1
         with:
+          toolchain: nightly
           command: build
           args: --release --all-features
       - name: Build example
         uses: actions-rs/cargo@v1
         with:
+          toolchain: nightly
           command: build
           args: --release --example stm32f042 --target thumbv6m-none-eabi
           use-cross: true
       - name: Test
         uses: actions-rs/cargo@v1
         with:
+          toolchain: nightly
           command: test
           args: --lib
