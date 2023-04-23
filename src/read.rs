@@ -1,7 +1,7 @@
 use embedded_hal::blocking::delay::{DelayMs, DelayUs};
 use embedded_hal::digital::v2::{InputPin, OutputPin};
 
-const TIMEOUT_US: u16 = 100;
+const TIMEOUT_US: u8 = 100;
 
 #[derive(Debug)]
 pub enum DhtError<E> {
@@ -22,7 +22,10 @@ impl<T> Delay for T where T: DelayMs<u8> + DelayUs<u8> {}
 pub trait InputOutputPin<E>: InputPin<Error = E> + OutputPin<Error = E> {}
 impl<T, E> InputOutputPin<E> for T where T: InputPin<Error = E> + OutputPin<Error = E> {}
 
-fn read_bit<E>(delay: &mut dyn Delay, pin: &impl InputPin<Error = E>) -> Result<bool, DhtError<E>> {
+fn read_bit<E>(
+    delay: &mut impl Delay,
+    pin: &impl InputPin<Error = E>,
+) -> Result<bool, DhtError<E>> {
     wait_until_timeout(delay, || pin.is_high())?;
     delay.delay_us(35u8);
     let high = pin.is_high()?;
@@ -30,7 +33,7 @@ fn read_bit<E>(delay: &mut dyn Delay, pin: &impl InputPin<Error = E>) -> Result<
     Ok(high)
 }
 
-fn read_byte<E>(delay: &mut dyn Delay, pin: &impl InputPin<Error = E>) -> Result<u8, DhtError<E>> {
+fn read_byte<E>(delay: &mut impl Delay, pin: &impl InputPin<Error = E>) -> Result<u8, DhtError<E>> {
     let mut byte: u8 = 0;
     for i in 0..8 {
         let bit_mask = 1 << (7 - (i % 8));
@@ -41,12 +44,10 @@ fn read_byte<E>(delay: &mut dyn Delay, pin: &impl InputPin<Error = E>) -> Result
     Ok(byte)
 }
 
-pub fn read_raw<P, E>(delay: &mut dyn Delay, pin: &mut P) -> Result<[u8; 4], DhtError<E>>
-where
-    P: InputOutputPin<E>,
-{
-    pin.set_low().ok();
-    delay.delay_ms(18_u8);
+pub fn read_raw<E>(
+    delay: &mut impl Delay,
+    pin: &mut impl InputOutputPin<E>,
+) -> Result<[u8; 4], DhtError<E>> {
     pin.set_high().ok();
     delay.delay_us(48_u8);
 
@@ -66,7 +67,7 @@ where
 }
 
 /// Wait until the given function returns true or the timeout is reached.
-fn wait_until_timeout<E, F>(delay: &mut dyn Delay, func: F) -> Result<(), DhtError<E>>
+fn wait_until_timeout<E, F>(delay: &mut impl Delay, func: F) -> Result<(), DhtError<E>>
 where
     F: Fn() -> Result<bool, E>,
 {
