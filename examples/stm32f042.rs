@@ -32,7 +32,7 @@ fn main() -> ! {
     delay.delay_ms(1000_u16);
 
     loop {
-        match dht11::Reading::read(&mut delay, &mut pa1) {
+        match dht11::read(&mut delay, &mut pa1) {
             Ok(dht11::Reading {
                 temperature,
                 relative_humidity,

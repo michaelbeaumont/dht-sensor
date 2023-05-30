@@ -80,21 +80,6 @@
 mod read;
 pub use read::{Delay, DhtError, InputOutputPin};
 
-pub trait DhtReading: internal::FromRaw + Sized {
-    fn read<P, E>(delay: &mut dyn Delay, pin: &mut P) -> Result<Self, read::DhtError<E>>
-    where
-        P: InputOutputPin<E>,
-    {
-        read::read_raw(delay, pin).map(Self::raw_to_reading)
-    }
-}
-
-mod internal {
-    pub trait FromRaw {
-        fn raw_to_reading(bytes: [u8; 4]) -> Self;
-    }
-}
-
 pub mod dht11 {
     use super::*;
 
@@ -104,36 +89,39 @@ pub mod dht11 {
         pub relative_humidity: u8,
     }
 
-    impl internal::FromRaw for Reading {
-        fn raw_to_reading(bytes: [u8; 4]) -> Reading {
-            let [rh, _, temp_signed, _] = bytes;
-            let temp = {
-                let (signed, magnitude) = convert_signed(temp_signed);
-                let temp_sign = if signed { -1 } else { 1 };
-                temp_sign * magnitude as i8
-            };
-            Reading {
-                temperature: temp,
-                relative_humidity: rh,
-            }
+    pub fn read<E>(
+        delay: &mut impl Delay,
+        pin: &mut impl InputOutputPin<E>,
+    ) -> Result<Reading, read::DhtError<E>> {
+        pin.set_low()?;
+        delay.delay_ms(18);
+        read::read_raw(delay, pin).map(raw_to_reading)
+    }
+
+    fn raw_to_reading(bytes: [u8; 4]) -> Reading {
+        let [relative_humidity, _, temp_signed, _] = bytes;
+        let temperature = {
+            let (signed, magnitude) = convert_signed(temp_signed);
+            let temp_sign = if signed { -1 } else { 1 };
+            temp_sign * magnitude as i8
+        };
+        Reading {
+            temperature,
+            relative_humidity,
         }
     }
 
-    impl DhtReading for Reading {}
-
     #[test]
     fn test_raw_to_reading() {
-        use super::internal::FromRaw;
-
         assert_eq!(
-            Reading::raw_to_reading([0x32, 0, 0x1B, 0]),
+            raw_to_reading([0x32, 0, 0x1B, 0]),
             Reading {
                 temperature: 27,
                 relative_humidity: 50
             }
         );
         assert_eq!(
-            Reading::raw_to_reading([0x80, 0, 0x83, 0]),
+            raw_to_reading([0x80, 0, 0x83, 0]),
             Reading {
                 temperature: -3,
                 relative_humidity: 128
@@ -151,38 +139,41 @@ pub mod dht22 {
         pub relative_humidity: f32,
     }
 
-    impl internal::FromRaw for Reading {
-        fn raw_to_reading(bytes: [u8; 4]) -> Reading {
-            let [rh_h, rh_l, temp_h_signed, temp_l] = bytes;
-            let rh = ((rh_h as u16) << 8 | (rh_l as u16)) as f32 / 10.0;
-            let temp = {
-                let (signed, magnitude) = convert_signed(temp_h_signed);
-                let temp_sign = if signed { -1.0 } else { 1.0 };
-                let temp_magnitude = ((magnitude as u16) << 8) | temp_l as u16;
-                temp_sign * temp_magnitude as f32 / 10.0
-            };
-            Reading {
-                temperature: temp,
-                relative_humidity: rh,
-            }
+    pub fn read<E>(
+        delay: &mut impl Delay,
+        pin: &mut impl InputOutputPin<E>,
+    ) -> Result<Reading, read::DhtError<E>> {
+        pin.set_low()?;
+        delay.delay_ms(1);
+        read::read_raw(delay, pin).map(raw_to_reading)
+    }
+
+    fn raw_to_reading(bytes: [u8; 4]) -> Reading {
+        let [rh_h, rh_l, temp_h_signed, temp_l] = bytes;
+        let relative_humidity = ((rh_h as u16) << 8 | (rh_l as u16)) as f32 / 10.0;
+        let temperature = {
+            let (signed, magnitude) = convert_signed(temp_h_signed);
+            let temp_sign = if signed { -1.0 } else { 1.0 };
+            let temp_magnitude = ((magnitude as u16) << 8) | temp_l as u16;
+            temp_sign * temp_magnitude as f32 / 10.0
+        };
+        Reading {
+            temperature,
+            relative_humidity,
         }
     }
 
-    impl DhtReading for Reading {}
-
     #[test]
     fn test_raw_to_reading() {
-        use super::internal::FromRaw;
-
         assert_eq!(
-            Reading::raw_to_reading([0x02, 0x10, 0x01, 0x1B]),
+            raw_to_reading([0x02, 0x10, 0x01, 0x1B]),
             Reading {
                 temperature: 28.3,
                 relative_humidity: 52.8
             }
         );
         assert_eq!(
-            Reading::raw_to_reading([0x02, 0x90, 0x80, 0x1B]),
+            raw_to_reading([0x02, 0x90, 0x80, 0x1B]),
             Reading {
                 temperature: -2.7,
                 relative_humidity: 65.6
