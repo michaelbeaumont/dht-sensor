@@ -26,12 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        toolchain: [stable, nightly]
-        cargo-args: [--all-features, ""]
-        exclude:
-          - toolchain: stable
-            cargo-args: --all-features
+        include:
           - toolchain: nightly
+            cargo-args: --all-features
+          - toolchain: stable
             cargo-args: ""
     steps:
       - uses: actions/checkout@v2
@@ -63,12 +61,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        toolchain: [stable, nightly]
-        cargo-args: [--all-features, ""]
-        exclude:
-          - toolchain: stable
-            cargo-args: --all-features
+        include:
           - toolchain: nightly
+            cargo-args: --all-features
+          - toolchain: stable
             cargo-args: ""
     steps:
       - uses: actions/checkout@v2
