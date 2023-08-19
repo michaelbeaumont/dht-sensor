@@ -5,7 +5,7 @@ description = "Driver for the DHT11/DHT22 sensor based on embedded-hal"
 authors = ["Michael Beaumont <mjboamail@gmail.com>"]
 keywords = ["embedded", "sensor", "humidity", "temperature", "embedded-hal-driver"]
 categories = ["embedded", "no-std", "hardware-support"]
-edition = "2018"
+edition = "2021"
 readme = "README.md"
 license = "MIT"
 repository = "https://github.com/michaelbeaumont/dht-sensor"
@@ -21,7 +21,7 @@ exclude = [
 async = ["embedded-hal-async"]
 
 [dependencies]
-embedded-hal = "^0.2.4"
+embedded-hal = {version = "^0.2.4", features = ["unproven"]}
 embedded-hal-async = { version = "0.2.0-alpha.1", optional = true }
 
 [dev-dependencies]
