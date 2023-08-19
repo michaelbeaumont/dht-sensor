@@ -25,10 +25,10 @@ embedded-hal = {version = "^0.2.4", features = ["unproven"]}
 embedded-hal-async = { version = "0.2.0-alpha.1", optional = true }
 
 [dev-dependencies]
-stm32f0xx-hal = {version = "^0.17.1", features = ["stm32f042"]}
-cortex-m = "^0.6.7"
-cortex-m-rt = "^0.6.13"
-cortex-m-semihosting = "^0.3.7"
+stm32f0xx-hal = {version = "^0.18.0", features = ["stm32f042"]}
+cortex-m = "^0.7.7"
+cortex-m-rt = "^0.7.3"
+cortex-m-semihosting = "^0.5.0"
 panic-halt = "^0.2.0"
 
 [profile.release]
