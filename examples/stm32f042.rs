@@ -28,7 +28,7 @@ fn main() -> ! {
     pa1.set_high().ok();
 
     // The DHT11 datasheet suggests 1 second
-    hprintln!("Waiting on the sensor...").unwrap();
+    hprintln!("Waiting on the sensor...");
     delay.delay_ms(1000_u16);
 
     loop {
@@ -36,8 +36,8 @@ fn main() -> ! {
             Ok(dht11::Reading {
                 temperature,
                 relative_humidity,
-            }) => hprintln!("{}°, {}% RH", temperature, relative_humidity).unwrap(),
-            Err(e) => hprintln!("Error {:?}", e).unwrap(),
+            }) => hprintln!("{}°, {}% RH", temperature, relative_humidity),
+            Err(e) => hprintln!("Error {:?}", e),
         }
 
         // Delay of at least 500ms before polling the sensor again, 1 second or more advised
