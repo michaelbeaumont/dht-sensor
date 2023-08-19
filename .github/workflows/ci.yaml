@@ -24,32 +24,27 @@ jobs:
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain: [stable, nightly]
+        cargo-args: [--all-features, ""]
+        exclude:
+          - toolchain: stable
+            cargo-args: --all-features
+          - toolchain: nightly
+            cargo-args: ""
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: ${{ matrix.toolchain }}
           components: clippy
       - uses: actions-rs/cargo@v1
         with:
+          toolchain: ${{ matrix.toolchain }}
           command: clippy
-          args: -- -D warnings
-  clippy_nightly:
-    name: Clippy (nightly)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly
-          components: clippy
-      - uses: actions-rs/cargo@v1
-        with:
-          toolchain: nightly
-          command: clippy
-          args: --all-features -- -D warnings
+          args: ${{ matrix.cargo-args }} -- -D warnings
   package:
     name: Cargo package
     runs-on: ubuntu-latest
@@ -66,55 +61,38 @@ jobs:
   build_and_test:
     name: Build and test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain: [stable, nightly]
+        cargo-args: [--all-features, ""]
+        exclude:
+          - toolchain: stable
+            cargo-args: --all-features
+          - toolchain: nightly
+            cargo-args: ""
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: ${{ matrix.toolchain }}
           target: thumbv6m-none-eabi
       - name: Build
         uses: actions-rs/cargo@v1
         with:
+          toolchain: ${{ matrix.toolchain }}
           command: build
-          args: --release
+          args: --release ${{ matrix.cargo-args }}
       - name: Build example
         uses: actions-rs/cargo@v1
         with:
+          toolchain: ${{ matrix.toolchain }}
           command: build
           args: --release --example stm32f042 --target thumbv6m-none-eabi
           use-cross: true
       - name: Test
         uses: actions-rs/cargo@v1
         with:
+          toolchain: ${{ matrix.toolchain }}
           command: test
-          args: --lib
-  build_and_test_nightly:
-    name: Build and test (nightly)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly
-          target: thumbv6m-none-eabi
-      - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          toolchain: nightly
-          command: build
-          args: --release --all-features
-      - name: Build example
-        uses: actions-rs/cargo@v1
-        with:
-          toolchain: nightly
-          command: build
-          args: --release --example stm32f042 --target thumbv6m-none-eabi
-          use-cross: true
-      - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          toolchain: nightly
-          command: test
-          args: --lib
+          args: --lib ${{ matrix.cargo-args }}
