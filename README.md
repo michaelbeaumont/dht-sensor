@@ -13,6 +13,7 @@ The only prerequisites are an embedded-hal implementation that provides:
 
 - `Delay`-implementing type, for example Cortex-M microcontrollers typically use the `SysTick`.
 - `InputOutputPin`-implementing type, for example an `Output<OpenDrain>` from `stm32f0xx_hal`.
+  - Note that you'll almost certainly need to configure your pin as open drain. See [#23](https://github.com/michaelbeaumont/dht-sensor/issues/23) for some discussion.
 
 See the [stm32f042 example](examples/stm32f042.rs) for a commented example of
 how to use the library.
