@@ -1,0 +1,20 @@
+[package]
+name = "stm32f303vc_async"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dht-sensor = { path = "../..", features = ["async"] }
+embassy-stm32 = { version = "0.2", features = ["stm32f303vc", "time-driver-any", "memory-x"] }
+embassy-executor = { version = "0.7", features = ["arch-cortex-m", "executor-thread"]}
+embassy-time = { version = "0.4" }
+cortex-m = { version = "0.7", features = ["critical-section-single-core"] }
+cortex-m-rt = "^0.7.3"
+cortex-m-semihosting = "^0.5.0"
+panic-halt = "^0.2.0"
+embedded-hal-async = "1"
+
+[profile.release]
+codegen-units = 1
+debug = true
+lto = true

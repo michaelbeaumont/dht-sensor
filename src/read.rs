@@ -1,5 +1,5 @@
-use embedded_hal::blocking::delay::{DelayMs, DelayUs};
-use embedded_hal::digital::v2::{InputPin, OutputPin};
+use embedded_hal::delay::DelayNs;
+use embedded_hal::digital::{InputPin, OutputPin};
 
 const TIMEOUT_US: u8 = 100;
 
@@ -16,24 +16,18 @@ impl<E> From<E> for DhtError<E> {
     }
 }
 
-pub trait Delay: DelayUs<u8> + DelayMs<u8> {}
-impl<T> Delay for T where T: DelayMs<u8> + DelayUs<u8> {}
-
-pub trait InputOutputPin<E>: InputPin<Error = E> + OutputPin<Error = E> {}
-impl<T, E> InputOutputPin<E> for T where T: InputPin<Error = E> + OutputPin<Error = E> {}
-
-fn read_bit<E>(
-    delay: &mut impl Delay,
-    pin: &impl InputPin<Error = E>,
-) -> Result<bool, DhtError<E>> {
+fn read_bit<P: InputPin>(
+    delay: &mut impl DelayNs,
+    pin: &mut P,
+) -> Result<bool, DhtError<P::Error>> {
     wait_until_timeout(delay, || pin.is_high())?;
-    delay.delay_us(35u8);
+    delay.delay_us(35);
     let high = pin.is_high()?;
     wait_until_timeout(delay, || pin.is_low())?;
     Ok(high)
 }
 
-fn read_byte<E>(delay: &mut impl Delay, pin: &impl InputPin<Error = E>) -> Result<u8, DhtError<E>> {
+fn read_byte<P: InputPin>(delay: &mut impl DelayNs, pin: &mut P) -> Result<u8, DhtError<P::Error>> {
     let mut byte: u8 = 0;
     for i in 0..8 {
         let bit_mask = 1 << (7 - (i % 8));
@@ -44,12 +38,12 @@ fn read_byte<E>(delay: &mut impl Delay, pin: &impl InputPin<Error = E>) -> Resul
     Ok(byte)
 }
 
-pub fn read_raw<E>(
-    delay: &mut impl Delay,
-    pin: &mut impl InputOutputPin<E>,
-) -> Result<[u8; 4], DhtError<E>> {
+pub fn read_raw<P: OutputPin + InputPin>(
+    delay: &mut impl DelayNs,
+    pin: &mut P,
+) -> Result<[u8; 4], DhtError<P::Error>> {
     pin.set_high().ok();
-    delay.delay_us(48_u8);
+    delay.delay_us(48);
 
     wait_until_timeout(delay, || pin.is_high())?;
     wait_until_timeout(delay, || pin.is_low())?;
@@ -67,15 +61,15 @@ pub fn read_raw<E>(
 }
 
 /// Wait until the given function returns true or the timeout is reached.
-fn wait_until_timeout<E, F>(delay: &mut impl Delay, func: F) -> Result<(), DhtError<E>>
+fn wait_until_timeout<E, F>(delay: &mut impl DelayNs, mut func: F) -> Result<(), DhtError<E>>
 where
-    F: Fn() -> Result<bool, E>,
+    F: FnMut() -> Result<bool, E>,
 {
     for _ in 0..TIMEOUT_US {
         if func()? {
             return Ok(());
         }
-        delay.delay_us(1_u8);
+        delay.delay_us(1);
     }
     Err(DhtError::Timeout)
 }
