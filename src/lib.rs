@@ -87,6 +87,7 @@ pub mod dht11 {
     use super::*;
 
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub struct Reading {
         pub temperature: i8,
         pub relative_humidity: u8,
