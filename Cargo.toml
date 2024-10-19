@@ -23,6 +23,7 @@ async = ["embedded-hal-async"]
 [dependencies]
 embedded-hal = {version = "^0.2.4", features = ["unproven"]}
 embedded-hal-async = { version = "0.2.0-alpha.1", optional = true }
+defmt = { version = "0.3", optional = true }
 
 [dev-dependencies]
 stm32f0xx-hal = {version = "^0.18.0", features = ["stm32f042"]}
