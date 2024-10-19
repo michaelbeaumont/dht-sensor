@@ -149,6 +149,7 @@ pub mod dht22 {
     use super::*;
 
     #[derive(Clone, Copy, Debug, PartialEq)]
+    #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub struct Reading {
         pub temperature: f32,
         pub relative_humidity: f32,
