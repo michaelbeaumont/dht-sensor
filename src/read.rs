@@ -30,7 +30,7 @@ fn read_bit<P: InputPin>(
 fn read_byte<P: InputPin>(delay: &mut impl DelayNs, pin: &mut P) -> Result<u8, DhtError<P::Error>> {
     let mut byte: u8 = 0;
     for i in 0..8 {
-        let bit_mask = 1 << (7 - (i % 8));
+        let bit_mask = 1 << (7 - i);
         if read_bit(delay, pin)? {
             byte |= bit_mask;
         }
