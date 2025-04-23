@@ -38,7 +38,7 @@ fn main() -> ! {
     loop {
         if DEV_SEL == DeviceSelect::Dht22 {
             // DHT22 uses a different read function
-            match dht22::read(&mut delay, &mut one_wire_pin) {
+            match dht22::blocking::read(&mut delay, &mut one_wire_pin) {
                 Ok(dht22::Reading {
                     temperature,
                     relative_humidity,
@@ -49,7 +49,7 @@ fn main() -> ! {
             delay.delay_ms(1000);
         } else {
             // Blocking read first.
-            match dht11::read(&mut delay, &mut one_wire_pin) {
+            match dht11::blocking::read(&mut delay, &mut one_wire_pin) {
                 Ok(dht11::Reading {
                     temperature,
                     relative_humidity,

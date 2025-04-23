@@ -92,13 +92,18 @@ pub mod dht11 {
         pub relative_humidity: u8,
     }
 
-    pub fn read<P: OutputPin + InputPin>(
-        delay: &mut impl DelayNs,
-        pin: &mut P,
-    ) -> Result<Reading, read::DhtError<P::Error>> {
-        pin.set_low()?;
-        delay.delay_ms(18);
-        read::read_raw(delay, pin).map(raw_to_reading)
+    pub mod blocking {
+        use super::DelayNs;
+        use super::{raw_to_reading, InputPin, OutputPin, Reading};
+
+        pub fn read<P: OutputPin + InputPin>(
+            delay: &mut impl DelayNs,
+            pin: &mut P,
+        ) -> Result<Reading, super::read::DhtError<P::Error>> {
+            pin.set_low()?;
+            delay.delay_ms(18);
+            super::read::read_raw(delay, pin).map(raw_to_reading)
+        }
     }
 
     #[cfg(feature = "async")]
@@ -162,13 +167,17 @@ pub mod dht22 {
         pub relative_humidity: f32,
     }
 
-    pub fn read<P: OutputPin + InputPin>(
-        delay: &mut impl DelayNs,
-        pin: &mut P,
-    ) -> Result<Reading, read::DhtError<P::Error>> {
-        pin.set_low()?;
-        delay.delay_ms(1);
-        read::read_raw(delay, pin).map(raw_to_reading)
+    pub mod blocking {
+        use super::DelayNs;
+        use super::{raw_to_reading, InputPin, OutputPin, Reading};
+        pub fn read<P: OutputPin + InputPin>(
+            delay: &mut impl DelayNs,
+            pin: &mut P,
+        ) -> Result<Reading, super::read::DhtError<P::Error>> {
+            pin.set_low()?;
+            delay.delay_ms(1);
+            super::read::read_raw(delay, pin).map(raw_to_reading)
+        }
     }
 
     #[cfg(feature = "async")]
