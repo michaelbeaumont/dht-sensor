@@ -1,5 +1,5 @@
 [package]
-name = "stm32f303vc_async"
+name = "stm32f303vc"
 version = "0.1.0"
 edition = "2024"
 
