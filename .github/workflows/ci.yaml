@@ -84,4 +84,4 @@ jobs:
         run: cargo build --release --manifest-path ./examples/stm32f303vc/Cargo.toml --target thumbv7m-none-eabi
 
       - name: Test
-        run: cargo test --lib ${{ matrix.cargo-args }}
+        run: cargo test ${{ matrix.cargo-args }}

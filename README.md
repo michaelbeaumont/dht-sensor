@@ -5,18 +5,35 @@
 
 This library provides a platform-agnostic driver for the [DHT11 and DHT22](https://learn.adafruit.com/dht/overview) sensors.
 
-Use one of two functions `dht11::Reading::read` and `dht22::Reading::read` to get a reading.
+Use one of two functions `dht11::blocking::read` and `dht22::blocking::read` to get a reading.
 
 ## Usage
 
 The only prerequisites are an embedded-hal implementation that provides:
 
-- `Delay`-implementing type, for example Cortex-M microcontrollers typically use the `SysTick`.
-- `InputOutputPin`-implementing type, for example an `Output<OpenDrain>` from `stm32f0xx_hal`.
-  - Note that you'll almost certainly need to configure your pin as open drain. See [#23](https://github.com/michaelbeaumont/dht-sensor/issues/23) for some discussion.
+- `DelayNs`-implementing type, for example Cortex-M microcontrollers typically use the `SysTick`.
+- `InputPin` and `OutputPin`-implementing type, for example an `Output<OpenDrain>` from `stm32f0xx_hal`.
 
-See the [stm32f042 example](examples/stm32f042.rs) for a commented example of
-how to use the library.
+When initializing the pin as an output, the state of the pin might depend on the specific chip
+used. Some might pull the pin low by default causing the sensor to be confused when we actually
+read it for the first time. The same thing happens when the sensor is polled too quickly in succession.
+In both of those cases you will get a `DhtError::Timeout`.
+
+To avoid this, you can pull the pin high when initializing it and polling the sensor with an
+interval of at least 500ms (determined experimentally). Some sources state a refresh rate of 1 or even 2 seconds.
+
+## Example
+
+See the following examples for how to use the library.
+
+### Blocking API
+
+- [stm32f051r8](examples/stm32f051r8/src/bin/sync.rs)
+
+### Async API
+
+- [stm32f051r8](examples/stm32f051r8/src/bin/async.rs)
+- [stm32f303vc](examples/stm32f303vc/src/bin/async.rs)
 
 ### Release mode may be required
 
