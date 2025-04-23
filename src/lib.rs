@@ -2,10 +2,10 @@
 //!
 //! This library provides a platform-agnostic driver for the [DHT11 and DHT22](https://learn.adafruit.com/dht/overview) sensors.
 //!
-//! Use one of two functions [`dht11::Reading::read`] and [`dht22::Reading::read`] to get a reading.
+//! Use one of two functions [`dht11::blocking::read`] and [`dht22::blocking::read`] to get a reading.
 //!
-//! [`dht11::Reading::read`]: dht11/struct.Reading.html#method.read
-//! [`dht22::Reading::read`]: dht22/struct.Reading.html#method.read
+//! [`dht11::blocking::read`]: dht11/blocking/fn.read.html
+//! [`dht22::blocking::read`]: dht22/blocking/fn.read.html
 //!
 //! ## Usage
 //!
@@ -24,7 +24,7 @@
 //!
 //! ## Example
 //!
-//! See the [stm32f042 example](https://github.com/michaelbeaumont/dht-sensor/blob/master/examples/stm32f042.rs) for a working example of
+//! See the [stm32f051r8 example](https://github.com/michaelbeaumont/dht-sensor/blob/master/examples/stm32f051r8/src/bin/sync.rs) for a working example of
 //! how to use the library.
 //!
 //! ```
