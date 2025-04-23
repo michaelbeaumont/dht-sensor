@@ -68,27 +68,20 @@ jobs:
             cargo-args: ""
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: ${{ matrix.toolchain }}
-          target: thumbv6m-none-eabi
+          targets: thumbv6m-none-eabi,thumbv7m-none-eabi
+
       - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          toolchain: ${{ matrix.toolchain }}
-          command: build
-          args: --release ${{ matrix.cargo-args }}
-      - name: Build example
-        uses: actions-rs/cargo@v1
-        with:
-          toolchain: ${{ matrix.toolchain }}
-          command: build
-          args: --release --example stm32f042 --target thumbv6m-none-eabi
-          use-cross: true
+        run: cargo build --release ${{ matrix.cargo-args }}
+
+      - name: Build stm32f051r8 example
+        run: cargo build --release --manifest-path ./examples/stm32f051r8/Cargo.toml --target thumbv6m-none-eabi
+      - name: Build stm32f303vc example
+        run: cargo build --release --manifest-path ./examples/stm32f303vc/Cargo.toml --target thumbv7m-none-eabi
+
       - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          toolchain: ${{ matrix.toolchain }}
-          command: test
-          args: --lib ${{ matrix.cargo-args }}
+        run: cargo test --lib ${{ matrix.cargo-args }}

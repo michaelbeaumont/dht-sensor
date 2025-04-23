@@ -2,10 +2,10 @@
 //!
 //! This library provides a platform-agnostic driver for the [DHT11 and DHT22](https://learn.adafruit.com/dht/overview) sensors.
 //!
-//! Use one of two functions [`dht11::Reading::read`] and [`dht22::Reading::read`] to get a reading.
+//! Use one of two functions [`dht11::blocking::read`] and [`dht22::blocking::read`] to get a reading.
 //!
-//! [`dht11::Reading::read`]: dht11/struct.Reading.html#method.read
-//! [`dht22::Reading::read`]: dht22/struct.Reading.html#method.read
+//! [`dht11::blocking::read`]: dht11/blocking/fn.read.html
+//! [`dht22::blocking::read`]: dht22/blocking/fn.read.html
 //!
 //! ## Usage
 //!
@@ -24,7 +24,7 @@
 //!
 //! ## Example
 //!
-//! See the [stm32f042 example](https://github.com/michaelbeaumont/dht-sensor/blob/master/examples/stm32f042.rs) for a working example of
+//! See the [stm32f051r8 example](https://github.com/michaelbeaumont/dht-sensor/blob/master/examples/stm32f051r8/src/bin/sync.rs) for a working example of
 //! how to use the library.
 //!
 //! ```
@@ -53,14 +53,14 @@
 //!
 //!     // An `Output<OpenDrain>` is both `InputPin` and `OutputPin`
 //!     let mut pa1 = cortex_m::interrupt::free(|cs| pa1.into_open_drain_output(cs));
-//!     
+//!
 //!     // Pulling the pin high to avoid confusing the sensor when initializing
 //!     pa1.set_high().ok();
 //!
 //!     // The DHT11 datasheet suggests 1 second
 //!     hprintln!("Waiting on the sensor...").unwrap();
 //!     delay.delay_ms(1000_u16);
-//!     
+//!
 //!     loop {
 //!         match dht11::Reading::read(&mut delay, &mut pa1) {
 //!             Ok(dht11::Reading {
@@ -69,19 +69,18 @@
 //!             }) => hprintln!("{}°, {}% RH", temperature, relative_humidity).unwrap(),
 //!             Err(e) => hprintln!("Error {:?}", e).unwrap(),
 //!         }
-//!         
+//!
 //!         // Delay of at least 500ms before polling the sensor again, 1 second or more advised
-//!         delay.delay_ms(500_u16);  
+//!         delay.delay_ms(500_u16);
 //!     }
 //! }
 //! ```
 #![cfg_attr(not(test), no_std)]
 
 mod read;
-pub use read::{Delay, DhtError, InputOutputPin};
-
-#[cfg(feature = "async")]
-use embedded_hal_async::delay::DelayUs;
+use embedded_hal::delay::DelayNs;
+use embedded_hal::digital::{InputPin, OutputPin};
+pub use read::DhtError;
 
 pub mod dht11 {
     use super::*;
@@ -93,24 +92,37 @@ pub mod dht11 {
         pub relative_humidity: u8,
     }
 
-    #[cfg(not(feature = "async"))]
-    pub fn read<E>(
-        delay: &mut impl Delay,
-        pin: &mut impl InputOutputPin<E>,
-    ) -> Result<Reading, read::DhtError<E>> {
-        pin.set_low()?;
-        delay.delay_ms(18);
-        read::read_raw(delay, pin).map(raw_to_reading)
+    pub mod blocking {
+        use super::DelayNs;
+        use super::{raw_to_reading, InputPin, OutputPin, Reading};
+
+        pub fn read<P: OutputPin + InputPin>(
+            delay: &mut impl DelayNs,
+            pin: &mut P,
+        ) -> Result<Reading, super::read::DhtError<P::Error>> {
+            pin.set_low()?;
+            delay.delay_ms(18);
+            super::read::read_raw(delay, pin).map(raw_to_reading)
+        }
     }
 
     #[cfg(feature = "async")]
-    pub async fn read<E>(
-        delay: &mut (impl Delay + DelayUs),
-        pin: &mut impl InputOutputPin<E>,
-    ) -> Result<Reading, read::DhtError<E>> {
-        pin.set_low()?;
-        DelayUs::delay_ms(delay, 18).await;
-        read::read_raw(delay, pin).map(raw_to_reading)
+    pub mod r#async {
+        use super::DelayNs;
+        use super::{raw_to_reading, InputPin, OutputPin, Reading};
+        use embedded_hal_async::delay::DelayNs as AsyncDelayNs;
+
+        /// Only the initial 18ms delay is performed asynchronously.
+        ///
+        /// The byte and bit read phase is performed with blocking delays.
+        pub async fn read<P: OutputPin + InputPin>(
+            delay: &mut (impl AsyncDelayNs + DelayNs),
+            pin: &mut P,
+        ) -> Result<Reading, crate::read::DhtError<P::Error>> {
+            pin.set_low()?;
+            embedded_hal_async::delay::DelayNs::delay_ms(delay, 18).await;
+            crate::read::read_raw(delay, pin).map(raw_to_reading)
+        }
     }
 
     fn raw_to_reading(bytes: [u8; 4]) -> Reading {
@@ -155,24 +167,36 @@ pub mod dht22 {
         pub relative_humidity: f32,
     }
 
-    #[cfg(not(feature = "async"))]
-    pub fn read<E>(
-        delay: &mut impl Delay,
-        pin: &mut impl InputOutputPin<E>,
-    ) -> Result<Reading, read::DhtError<E>> {
-        pin.set_low()?;
-        delay.delay_ms(1);
-        read::read_raw(delay, pin).map(raw_to_reading)
+    pub mod blocking {
+        use super::DelayNs;
+        use super::{raw_to_reading, InputPin, OutputPin, Reading};
+        pub fn read<P: OutputPin + InputPin>(
+            delay: &mut impl DelayNs,
+            pin: &mut P,
+        ) -> Result<Reading, super::read::DhtError<P::Error>> {
+            pin.set_low()?;
+            delay.delay_ms(1);
+            super::read::read_raw(delay, pin).map(raw_to_reading)
+        }
     }
 
     #[cfg(feature = "async")]
-    pub async fn read<E>(
-        delay: &mut (impl Delay + DelayUs),
-        pin: &mut impl InputOutputPin<E>,
-    ) -> Result<Reading, read::DhtError<E>> {
-        pin.set_low()?;
-        DelayUs::delay_ms(delay, 1).await;
-        read::read_raw(delay, pin).map(raw_to_reading)
+    pub mod r#async {
+        use super::DelayNs;
+        use super::{raw_to_reading, InputPin, OutputPin, Reading};
+        use embedded_hal_async::delay::DelayNs as AsyncDelayNs;
+
+        /// Only the initial 1 ms delay is performed asynchronously.
+        ///
+        /// The byte and bit read phase is performed with blocking delays.
+        pub async fn read<P: OutputPin + InputPin>(
+            delay: &mut (impl AsyncDelayNs + DelayNs),
+            pin: &mut P,
+        ) -> Result<Reading, crate::read::DhtError<P::Error>> {
+            pin.set_low()?;
+            embedded_hal_async::delay::DelayNs::delay_ms(delay, 1).await;
+            crate::read::read_raw(delay, pin).map(raw_to_reading)
+        }
     }
 
     fn raw_to_reading(bytes: [u8; 4]) -> Reading {
