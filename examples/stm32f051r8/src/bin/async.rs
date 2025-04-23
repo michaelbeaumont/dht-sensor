@@ -46,7 +46,7 @@ async fn main(_spawner: Spawner) -> ! {
 
     loop {
         if DEV_SEL == DeviceSelect::Dht22 {
-            match dht22::asynch::read(&mut delay, &mut one_wire_pin).await {
+            match dht22::r#async::read(&mut delay, &mut one_wire_pin).await {
                 Ok(dht22::Reading {
                     temperature,
                     relative_humidity,
@@ -56,7 +56,7 @@ async fn main(_spawner: Spawner) -> ! {
             // Delay of at least 500ms before polling the sensor again, 1 second or more advised
             delay.delay_ms(1000).await;
         } else {
-            match dht11::asynch::read(&mut delay, &mut one_wire_pin).await {
+            match dht11::r#async::read(&mut delay, &mut one_wire_pin).await {
                 Ok(dht11::Reading {
                     temperature,
                     relative_humidity,

@@ -102,7 +102,7 @@ pub mod dht11 {
     }
 
     #[cfg(feature = "async")]
-    pub mod asynch {
+    pub mod r#async {
         use super::DelayNs;
         use super::{raw_to_reading, InputPin, OutputPin, Reading};
         use embedded_hal_async::delay::DelayNs as AsyncDelayNs;
@@ -172,7 +172,7 @@ pub mod dht22 {
     }
 
     #[cfg(feature = "async")]
-    pub mod asynch {
+    pub mod r#async {
         use super::DelayNs;
         use super::{raw_to_reading, InputPin, OutputPin, Reading};
         use embedded_hal_async::delay::DelayNs as AsyncDelayNs;
