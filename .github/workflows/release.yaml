@@ -16,7 +16,7 @@ jobs:
       - name: Get version
         id: version
         run: echo "::set-output name=version::$(cargo read-manifest | jq .version -r)"
-      - uses: actions/github-script@v3
+      - uses: actions/github-script@v8
         name: Create draft release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
