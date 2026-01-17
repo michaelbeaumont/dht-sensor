@@ -5,15 +5,14 @@ on:
 
 jobs:
   release:
-    name: Release
-    runs-on: ubuntu-20.04
+    name: Create draft release
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
-          profile: minimal
-      - name: Get version
+      - name: Get package version
         id: version
         run: echo "::set-output name=version::$(cargo read-manifest | jq .version -r)"
       - uses: actions/github-script@v8
