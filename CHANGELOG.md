@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0
+
+### Breaking changes
+
+The module structure has changed. The existing `dht*::Reading::read` functions have moved to `dht*::blocking::read`.
+
+### Features
+
+* New `dht*::async` module for async support
+* defmt support
+
+### Dependency updates
+
+* embedded-hal v1.0
+
 ## 0.2.1
 
 ### Fixes
