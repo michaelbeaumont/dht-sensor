@@ -29,7 +29,7 @@ jobs:
 
             console.log("Creating draft release for ${{ steps.version.outputs.version }}");
 
-            await github.repos.createRelease({
+            await github.rest.repos.createRelease({
                 ...context.repo,
                 draft: true,
                 name: "dht-sensor v${{ steps.version.outputs.version }}",
