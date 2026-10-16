@@ -14,7 +14,7 @@
 //! When initializing the pin as an output, the state of the pin might depend on the specific chip
 //! used. Some might pull the pin low by default causing the sensor to be confused when we actually
 //! read it for the first time. The same thing happens when the sensor is polled too quickly in succession.
-//! In both of those cases you will get a `DhtError::Timeout`.
+//! In both of those cases you will get a `DhtError::Timeout(Stage::AckHigh)`.
 //!
 //! To avoid this, you can pull the pin high when initializing it and polling the sensor with an
 //! interval of at least 500ms (determined experimentally). Some sources state a refresh rate of 1 or even 2 seconds.
@@ -36,7 +36,7 @@
 mod read;
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::{InputPin, OutputPin};
-pub use read::DhtError;
+pub use read::{DhtError, Stage};
 
 pub mod dht11 {
     use super::*;
